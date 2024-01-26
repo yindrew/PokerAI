@@ -1,11 +1,6 @@
 package com.example.demo.controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.demo.model.Decision;
 import com.example.demo.model.GameState;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -38,19 +33,7 @@ public class DecisionController {
         }
     }
 
-    
-    @GetMapping("/")
-    public String helloWorld() {
-        System.out.println("Hello World");
-        return "Hello World";
-    }
 
-    // handles the decision request from python
-    @PostMapping("/python-post")
-    public ResponseEntity<?> receiveDecision(@RequestBody Decision decision) {
-        System.out.println(decision.getAction() + " " + decision.getValue());
-        return ResponseEntity.ok("Decision received");
-    }
 
 
 

@@ -19,5 +19,9 @@ public class Hand {
     public void setHand(Card[] h) {
         hand = h;
     }
+
+    public String toString() {
+        return (" " + hand[0] + hand[1]);
+    }
     
 }
