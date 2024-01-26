@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import com.example.demo.model.Board;
 import com.example.demo.model.Card;
 import com.example.demo.model.Hand;
-import com.example.demo.service.HandRanking;
 
 public class HandRankingTest {
     Board board;
@@ -186,7 +185,6 @@ public class HandRankingTest {
     @Test
     public void testingChangingBoardPreflop() throws Exception {
         Hand h1 = new Hand("AcQc");
-        Hand h2 = new Hand("KcKs");
         Card[] tempBoard = new Card[] {new Card("9c"), new Card("Qs"), new Card("Jc"), new Card("2s")};
         Board board = new Board(tempBoard);
 
