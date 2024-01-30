@@ -34,7 +34,7 @@ public class Deck {
 
     public boolean removeSpecificCard(Card newCard) {
         for (int x = 0; x < deck.size(); x++) {
-            if (deck.get(x).isSameCard(newCard)){
+            if (deck.get(x).equals(newCard)){
                 deck.remove(x);
                 return true;
             }

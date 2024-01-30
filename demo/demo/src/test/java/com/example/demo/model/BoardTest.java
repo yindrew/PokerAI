@@ -28,11 +28,17 @@ class BoardTest {
 
     }
 
+
+    @Test
+    void testEmptyDeck() {
+        board = new Board(null);
+    }
+
     @Test
     void addCard() {
-        assertTrue(board.getBoardCards().get(0).isSameCard(card7s));
+        assertTrue(board.getBoardCards().get(0).equals(card7s));
         board.addCard(cardKd);
-        assertTrue(board.getBoardCards().get(1).isSameCard(cardKd));
+        assertTrue(board.getBoardCards().get(1).equals(cardKd));
     }
 
     @Test

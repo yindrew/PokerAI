@@ -11,6 +11,24 @@ public class Player {
 
     }
 
+    public Player(String name) {
+        this.name = name;
+    }
+
+
+    public Log getAction(String action) {
+        int size;
+        if (action.equals("raise")) {
+            size = 3;
+        }
+        else if (action.equals("fold")){
+            size = 0;
+        }
+        else {
+            size = 1;
+        }
+        return new Log(action, size);
+    }
 
     public Log getAction(GameLog log) {
 
@@ -50,6 +68,9 @@ public class Player {
         return name;
     }
 
+    public String toString() {
+        return getName();
+    }
 
 
 }

@@ -11,7 +11,9 @@ public class Board implements Cloneable{
     //constructor
     public Board(Card[] cards) {
         boardCards = new ArrayList<Card>();
-        Collections.addAll(boardCards, cards);
+        if (cards != null) {
+            Collections.addAll(boardCards, cards);
+        }
     }
 
 

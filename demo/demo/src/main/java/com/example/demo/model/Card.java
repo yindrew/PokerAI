@@ -47,9 +47,7 @@ public class Card {
         return this.getSuit() == otherCard.getSuit();
     }
 
-    public boolean isSameCard(Card otherCard) {
-        return this.isSameSuit(otherCard) && this.getCardValueDifference(otherCard) == 0;
-    }
+
 
     public int getCardValueDifference(Card otherCard) {
         return this.getCardVal() - otherCard.getCardVal();
@@ -81,6 +79,9 @@ public class Card {
         return ("" + value + suit);
     }
 
+    public boolean equals(Card otherCard) {
+        return this.isSameSuit(otherCard) && this.getCardValueDifference(otherCard) == 0;
+    }
 
     
 }

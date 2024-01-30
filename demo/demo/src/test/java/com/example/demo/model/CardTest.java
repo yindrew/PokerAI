@@ -29,9 +29,9 @@ class CardTest {
         Card card7d = new Card("7d");
         Card card8s = new Card("8s");
 
-        assertEquals(true, card7s.isSameCard(card7sSame));
-        assertEquals(false, card7s.isSameCard(card7d));
-        assertEquals(false, card7s.isSameCard(card8s));
+        assertEquals(true, card7s.equals(card7sSame));
+        assertEquals(false, card7s.equals(card7d));
+        assertEquals(false, card7s.equals(card8s));
 
     }
 

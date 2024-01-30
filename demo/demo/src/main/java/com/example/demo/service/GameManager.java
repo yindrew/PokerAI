@@ -1,10 +1,11 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Log;;
+import com.example.demo.model.Log;
 import com.example.demo.model.Board;
 import com.example.demo.model.Deck;
 import com.example.demo.model.GameLog;
 import com.example.demo.model.Player;
+
 
 public class GameManager {
     private Player player1;
@@ -19,8 +20,8 @@ public class GameManager {
     
 
     public GameManager() {
-        player1 = new Player();
-        player2 = new Player();
+        player1 = new Player("Player 1");
+        player2 = new Player("Player 2");
         gameLog = new GameLog();
         potSize = 0;
         deck = new Deck();
@@ -48,21 +49,35 @@ public class GameManager {
 
 
     public void preflop() {
+        // deal hole cards
         dealHoleCards();
-        if (currentPlayerIndex == 0) {
-            currentPlayerIndex = 1;
-        }
-        else {
-            currentPlayerIndex = 0;
-        }
 
         // first orbit
+
+        // first decision
         Log log1 = getCurrentPlayer().getAction(gameLog);
         gameLog.addLog(log1);
-        nextTurn();
+        // handle the first decision
         if (log1.getAction().equals("fold")){
             return;
         }
+        else if (log1.getAction().equals("raise")){
+            //handle player 2s action
+        }
+
+
+
 
     }
+
+
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public Player[] getPlayers() {
+        return players;
+    }
+
 }

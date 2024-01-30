@@ -34,9 +34,9 @@ class DeckTest {
 
     @Test
     void dealHand() {
-        Card[] dealtHand = deck.dealHand();
+        Hand dealtHand = deck.dealHand();
         assertEquals(50, deck.getDeckSize());
-        assertFalse(dealtHand[0].isSameCard(dealtHand[1]));
+        assertFalse(dealtHand.getHand()[0].equals(dealtHand.getHand()[1]));
     }
 
     @Test
@@ -45,7 +45,7 @@ class DeckTest {
         assertEquals(51, deck.getDeckSize());
         Card card2 = deck.getCard();
         assertEquals(50, deck.getDeckSize());
-        assertFalse(card1.isSameCard(card2));
+        assertFalse(card1.equals(card2));
 
     }
 
