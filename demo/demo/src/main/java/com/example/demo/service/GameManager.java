@@ -6,6 +6,23 @@ import com.example.demo.model.Deck;
 import com.example.demo.model.GameLog;
 import com.example.demo.model.Player;
 
+enum GameState {
+    PreFlop,
+    Flop,
+    Turn,
+    River,
+    Showdown,
+    GameOver
+}
+
+// Enum for player actions
+enum Action {
+    Check,
+    Bet,
+    Call,
+    Raise,
+    Fold
+}
 
 public class GameManager {
     private Player player1;
@@ -13,10 +30,11 @@ public class GameManager {
     private GameLog gameLog;
     private int potSize;
     private Deck deck;
-    private Board board;
     public boolean button = true; // if button is true, player1 is IP and first to act
     private Player[] players;
     private int currentPlayerIndex;
+    private Board board;
+    private GameState currentState;
     
 
     public GameManager() {
@@ -28,6 +46,17 @@ public class GameManager {
         board = new Board(null);
         players = new Player[]{player1, player2};
         currentPlayerIndex = 0;
+    }
+
+    public void setUpPot() {
+        changeStack(-1, player1);
+        changeStack(-1, player1);
+        potSize = 2;
+    }
+
+    public void changeStack(int value, Player player){
+        int currentStack = player.getStack();
+        player.setStack(currentStack + value);
     }
 
     public void dealHoleCards() {
@@ -47,27 +76,107 @@ public class GameManager {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
     }
 
+    public void setUpGame() {
+        setUpPot();
 
-    public void preflop() {
-        // deal hole cards
-        dealHoleCards();
+    }
 
-        // first orbit
-
-        // first decision
-        Log log1 = getCurrentPlayer().getAction(gameLog);
-        gameLog.addLog(log1);
-        // handle the first decision
-        if (log1.getAction().equals("fold")){
-            return;
+    // Method to advance the game based on player actions
+    public void advanceGame() {
+        switch (currentState) {
+            case PreFlop:
+                handlePreFlop();
+                break;
+            case Flop:
+                handleFlop();
+                break;
+            case Turn:
+                handleTurn();
+                break;
+            case River:
+                handleRiver();
+                break;
+            case Showdown:
+                determineWinner();
+                currentState = GameState.GameOver;
+                break;
+            case GameOver:
+                // Game over logic
+                break;
         }
-        else if (log1.getAction().equals("raise")){
-            //handle player 2s action
+    }
+
+    private void handlePreFlop() {
+
+        while (!preFlopRoundEnded()) {
+            Log currentAction = players[currentPlayerIndex].getAction(gameLog);
+            Action action = Action.valueOf(currentAction.getAction());
+            switch (action) {
+                case Fold:
+                    handleFold(action);
+                    break;
+                case Call:
+                    handleCall(action);
+                    break;
+                case Raise:
+                    handleRaise(action);
+                    break;
+                // Additional cases like Check, if applicable
+                default:
+                    break;
+            }
+    
         }
+    
+        currentState = GameState.Flop;
+    }
+    
+    private void handleRaise(Action action) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleRaise'");
+    }
 
+    private void handleCall(Action action) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleCall'");
+    }
 
+    private void handleFold(Action action) {
 
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'handleFold'");
+    }
 
+    private boolean preFlopRoundEnded() {
+        return false;
+        // Logic to determine if all players have acted and the round can end
+        // This typically checks if all remaining players have matched the current highest bet or folded
+    }
+    
+    
+
+    private void handleFlop() {
+        throw new UnsupportedOperationException("Unimplemented method 'handleFold'");
+
+        // Handle Flop actions
+    }
+
+    // Similar methods for Turn and River
+    private void handleTurn() { 
+        throw new UnsupportedOperationException("Unimplemented method 'handleFold'");
+
+        /* ... */ 
+    }
+
+    private void handleRiver() { 
+        throw new UnsupportedOperationException("Unimplemented method 'handleFold'");
+
+        /* ... */ 
+
+    }
+
+    private void determineWinner() {
+        // Determine the winner and handle showdown logic
     }
 
 
