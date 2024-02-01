@@ -33,4 +33,11 @@ public class GameManagerTest {
         gameManager.nextTurn();
         assertEquals(gameManager.getCurrentPlayer(), gameManager.getPlayers()[0]);
     }
+
+
+    @Test
+    void testHandlePreflop() {
+        gameManager = new GameManager();
+        
+    }
 }

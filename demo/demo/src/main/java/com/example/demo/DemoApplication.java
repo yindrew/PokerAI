@@ -3,6 +3,7 @@ package com.example.demo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.example.demo.model.Action;
 import com.example.demo.model.Board;
 import com.example.demo.model.Card;
 import com.example.demo.model.GameLog;
@@ -18,8 +19,8 @@ public class DemoApplication {
         SpringApplication.run(DemoApplication.class, args);
 
         // initializing the log 
-        Log l1 = new Log("bet", 5);
-        Log l2 = new Log("fold", 0);
+        Log l1 = new Log(Action.BET, 5);
+        Log l2 = new Log(Action.FOLD, 0);
         GameLog log = new GameLog();
         log.addLog(l1);
         log.addLog(l2);

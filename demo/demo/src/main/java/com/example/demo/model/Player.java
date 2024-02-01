@@ -18,22 +18,23 @@ public class Player {
 
     public Log getAction(String action) {
         int size;
-        if (action.equals("raise")) {
+        if (action.equals("RAISE")) {
             size = 3;
         }
-        else if (action.equals("fold")){
+        else if (action.equals("FOLD")){
             size = 0;
         }
         else {
-            size = 1;
+            size = gameLog.getLogs().get(gameLog.getSize() - 1).getSize();
         }
-        return new Log(action, size);
+        Action newAction = Action.valueOf(action);
+        return new Log(newAction, size);
     }
 
     public Log getAction(GameLog log) {
 
         // change to call the python service to get a action
-        return new Log("r", 5);
+        return new Log(Action.RAISE, 5);
     }
 
     public void setHand(Hand h) {

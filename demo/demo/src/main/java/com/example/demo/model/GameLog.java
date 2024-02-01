@@ -13,5 +13,13 @@ public class GameLog {
         return gameLog;
     }
 
+    public void clearLog() {
+        gameLog.clear();
+    }
+
+    public int getSize() {
+        return gameLog.size();
+    }
+
 }
 

@@ -7,34 +7,27 @@ import com.example.demo.model.GameLog;
 import com.example.demo.model.Player;
 
 enum GameState {
-    PreFlop,
-    Flop,
-    Turn,
-    River,
-    Showdown,
-    GameOver
+    PREFLOP,
+    FLOP,
+    TURN,
+    RIVER,
+    SHOWDOWN,
+    GAMEOVER
 }
 
-// Enum for player actions
-enum Action {
-    Check,
-    Bet,
-    Call,
-    Raise,
-    Fold
-}
 
 public class GameManager {
     private Player player1;
     private Player player2;
+    private Player[] players;
     private GameLog gameLog;
     private int potSize;
     private Deck deck;
-    public boolean button = true; // if button is true, player1 is IP and first to act
-    private Player[] players;
     private int currentPlayerIndex;
     private Board board;
     private GameState currentState;
+    private int flopx = 0;
+    
     
 
     public GameManager() {
@@ -46,6 +39,8 @@ public class GameManager {
         board = new Board(null);
         players = new Player[]{player1, player2};
         currentPlayerIndex = 0;
+        currentState = GameState.PREFLOP;
+
     }
 
     public void setUpPot() {
@@ -76,88 +71,134 @@ public class GameManager {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
     }
 
+
+
     public void setUpGame() {
         setUpPot();
+        deck.newDeck();
+        dealHoleCards();
+        board.clearBoard();
+        gameLog.clearLog();
+        currentState = GameState.PREFLOP;
 
     }
 
     // Method to advance the game based on player actions
     public void advanceGame() {
         switch (currentState) {
-            case PreFlop:
+            case PREFLOP:
                 handlePreFlop();
                 break;
-            case Flop:
+            case FLOP:
                 handleFlop();
                 break;
-            case Turn:
+            case TURN:
                 handleTurn();
                 break;
-            case River:
+            case RIVER:
                 handleRiver();
                 break;
-            case Showdown:
+            case SHOWDOWN:
                 determineWinner();
-                currentState = GameState.GameOver;
+                currentState = GameState.GAMEOVER;
                 break;
-            case GameOver:
-                // Game over logic
+            case GAMEOVER:
+                System.out.println("Hand is over");
                 break;
         }
     }
 
     private void handlePreFlop() {
+        Log currentAction = players[currentPlayerIndex].getAction(gameLog);
 
-        while (!preFlopRoundEnded()) {
-            Log currentAction = players[currentPlayerIndex].getAction(gameLog);
-            Action action = Action.valueOf(currentAction.getAction());
-            switch (action) {
-                case Fold:
-                    handleFold(action);
-                    break;
-                case Call:
-                    handleCall(action);
-                    break;
-                case Raise:
-                    handleRaise(action);
-                    break;
-                // Additional cases like Check, if applicable
-                default:
-                    break;
-            }
-    
+        // based on the action handle the action.
+        switch (currentAction.getAction()) {
+            case FOLD:
+                handleFold(currentAction);
+                currentState = GameState.GAMEOVER;
+                break;
+            case CALL:
+                handleCall(currentAction);
+                if (gameLog.getLogs().size() == 1){
+                    currentState = GameState.PREFLOP;
+                } 
+                else {
+                    currentState = GameState.FLOP;
+                }
+                break;
+            case RAISE:
+                handleRaise(currentAction);
+                currentState = GameState.PREFLOP;
+                break;
+            case CHECK:
+                handleCheck(currentAction);
+                currentState = GameState.FLOP;
+                break;
+            default:
+                break;
         }
-    
-        currentState = GameState.Flop;
+        advanceGame();
     }
     
-    private void handleRaise(Action action) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleRaise'");
+    private void handleRaise(Log action) {
+        gameLog.addLog(action);
+        changeStack(-action.getSize(), players[currentPlayerIndex]);
+        nextTurn();
     }
 
-    private void handleCall(Action action) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleCall'");
+    private void handleCheck(Log action) {
+        gameLog.addLog(action);
+        changeStack(-action.getSize(), players[currentPlayerIndex]);
+        nextTurn();
+
     }
 
-    private void handleFold(Action action) {
+    private void handleCall(Log action) {
+        gameLog.addLog(action);
+        changeStack(-action.getSize(), players[currentPlayerIndex]);
+        nextTurn();
 
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'handleFold'");
     }
 
-    private boolean preFlopRoundEnded() {
-        return false;
-        // Logic to determine if all players have acted and the round can end
-        // This typically checks if all remaining players have matched the current highest bet or folded
+    private void handleFold(Log action) {
+        gameLog.addLog(action);
+        changeStack(-action.getSize(), players[currentPlayerIndex]);
     }
+
     
     
 
     private void handleFlop() {
-        throw new UnsupportedOperationException("Unimplemented method 'handleFold'");
+        Log currentAction = players[currentPlayerIndex].getAction(gameLog);
 
+        // based on the action handle the action.
+        switch (currentAction.getAction()) {
+            case FOLD:
+                handleFold(currentAction);
+                currentState = GameState.GAMEOVER;
+                break;
+            case CALL:
+                handleCall(currentAction);
+                currentState = GameState.TURN;
+                break;
+            case RAISE:
+                handleRaise(currentAction);
+                currentState = GameState.FLOP;
+                break;
+            case CHECK:
+                handleCheck(currentAction);
+                flopx += 1;
+                if (flopx == 2) {
+                    currentState = GameState.TURN;
+                }
+                else{
+                    currentState = GameState.FLOP;
+                }
+                break;
+            default:
+                break;
+        }
+        advanceGame();
         // Handle Flop actions
     }
 
@@ -188,5 +229,18 @@ public class GameManager {
     public Player[] getPlayers() {
         return players;
     }
+
+    public int getPotSize() {
+        return potSize;
+    }
+
+
+    public static void main(String[] args) {
+        GameManager GM = new GameManager();
+        GM.setUpGame();
+        GM.advanceGame();
+
+
+     }
 
 }

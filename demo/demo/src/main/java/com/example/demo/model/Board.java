@@ -16,6 +16,9 @@ public class Board implements Cloneable{
         }
     }
 
+    public void clearBoard() {
+        boardCards.clear();
+    }
 
     public void addCard(Card newCard) {
         boardCards.add(newCard);

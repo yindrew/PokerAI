@@ -1,20 +1,22 @@
 package com.example.demo.model;
 
+
+
 public class Log {
-    private String action;
+    private Action action;
     private int size;
 
-    public Log(String action, int size) {
+    public Log(Action action, int size) {
         this.action = action;
         this.size = size;
     }
 
     // Getters and setters
-    public String getAction() {
+    public Action getAction() {
         return action;
     }
 
-    public void setAction(String action) {
+    public void setAction(Action action) {
         this.action = action;
     }
 

@@ -17,7 +17,28 @@ public class HandRanking {
     private PairFinder pairFinder;
     private String handType;
     
-
+    public int handVal(String handType) {
+        switch (handType) {
+            case "Straight Flush":
+                return 9;
+            case "Quads":
+                return 8;
+            case "Full House":
+                return 7;
+            case "Flush":
+                return 6;
+            case "Straight":
+                return 5;
+            case "Trips":
+                return 4;
+            case "Two Pair":
+                return 3;
+            case "One Pair":
+                return 2;
+            default:
+                return 1;
+        }
+    }
     public HandRanking(Hand hand, Board board) throws Exception {
         this.hand = hand;
         this.board = board;
