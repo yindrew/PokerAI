@@ -3,7 +3,7 @@ package com.example.demo.model;
 public class Player {
     private Hand hand;
     private GameLog gameLog;
-    private int stack;
+    private double stack;
     private String name;
     
 
@@ -13,20 +13,11 @@ public class Player {
 
     public Player(String name) {
         this.name = name;
+        this.stack = 100;
     }
 
 
-    public Log getAction(String action) {
-        int size;
-        if (action.equals("RAISE")) {
-            size = 3;
-        }
-        else if (action.equals("FOLD")){
-            size = 0;
-        }
-        else {
-            size = gameLog.getLogs().get(gameLog.getSize() - 1).getSize();
-        }
+    public Log getAction(String action, double size) {
         Action newAction = Action.valueOf(action);
         return new Log(newAction, size);
     }
@@ -53,11 +44,11 @@ public class Player {
         return gameLog;
     }
 
-    public void setStack(int s) {
+    public void setStack(double s) {
         stack = s;
     }
 
-    public int getStack() {
+    public double getStack() {
         return stack;
     }
 
@@ -72,6 +63,8 @@ public class Player {
     public String toString() {
         return getName();
     }
+
+
 
 
 }

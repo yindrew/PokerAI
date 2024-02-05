@@ -5,6 +5,7 @@ public enum Action {
     CALL,
     FOLD,
     CHECK,
-    BET
+    BET,
+    ALL_IN
 }
 

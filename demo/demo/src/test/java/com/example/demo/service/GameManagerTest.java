@@ -36,8 +36,10 @@ public class GameManagerTest {
 
 
     @Test
-    void testHandlePreflop() {
+    void testHandlePreflop() throws Exception {
         gameManager = new GameManager();
+        gameManager.setUpGame();
+        gameManager.advanceGame();
         
     }
 }

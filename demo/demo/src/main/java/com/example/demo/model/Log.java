@@ -4,9 +4,9 @@ package com.example.demo.model;
 
 public class Log {
     private Action action;
-    private int size;
+    private double size;
 
-    public Log(Action action, int size) {
+    public Log(Action action, double size) {
         this.action = action;
         this.size = size;
     }
@@ -20,7 +20,7 @@ public class Log {
         this.action = action;
     }
 
-    public int getSize() {
+    public double getSize() {
         return size;
     }
 
