@@ -27,5 +27,12 @@ public class Log {
     public void setSize(int size) {
         this.size = size;
     }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(action.toString());
+        sb.append(" " + size);
+        return sb.toString();
+    }
 }
 

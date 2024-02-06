@@ -21,5 +21,13 @@ public class GameLog {
         return gameLog.size();
     }
 
+    public String toString() {
+        StringBuilder sBuilder = new StringBuilder();
+        for (Log log : gameLog){
+            sBuilder.append(log.toString() + " ");
+        }
+        return sBuilder.toString();
+    }
+
 }
 

@@ -433,6 +433,165 @@ public class HandRanking {
     }
 
 
+    public int compare(HandRanking hr) throws Exception {
+        int handVal1 = handVal(this.handType());
+        int handVal2 = handVal(hr.handType());
+        if (handVal1 > handVal2){
+            return 1;
+        }
+        if (handVal1 < handVal2) {
+            return -1;
+        }
+        return compareHands(this.handType, hr);
+
+    }
+    private int compareHands(String handType, HandRanking hr) {
+        if (handType.equals("Straight Flush")){
+            return compareStraightFlush(hr);
+        }
+        else if (handType.equals("Quads")){
+            return compareQuads(hr);
+        }
+        else if (handType.equals("Full House")){
+            return compareFullHouse(hr);
+        }
+        else if (handType.equals("Flush")){
+            return compareFlush(hr);
+        }
+        else if (handType.equals("Straight")){
+            return compareStraight(hr);
+
+        }
+        else if (handType.equals("Trips")){
+            return compareTrips(hr);
+        }
+        else if (handType.equals("Two Pair")){
+            return compareTwoPair(hr);
+        }
+        else if (handType.equals("One Pair")){
+            return compareTwoPair(hr);
+        }
+        else {
+            return compareTwoPair(hr);
+        }
+    }
+
+    private int compareStraightFlush(HandRanking hr) {
+        Card h1Card = this.getBestFive()[0];
+        Card h2Card = hr.getBestFive()[0];
+
+        if (h1Card.getCardVal() > h2Card.getCardVal()){
+            return 1;
+        }
+        else if (h1Card.getCardVal() < h2Card.getCardVal()){
+            return -1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    private int compareQuads(HandRanking hr) {
+        Card h1Card = this.getBestFive()[0];
+        Card h2Card = hr.getBestFive()[0];
+
+        if (h1Card.getCardVal() > h2Card.getCardVal()){
+            return 1;
+        }
+        else{
+            return -1;
+        }
+    }
+
+    private int compareFullHouse(HandRanking hr) {
+        Card h1Card = this.getBestFive()[0];
+        Card h2Card = hr.getBestFive()[0];
+
+        if (h1Card.getCardVal() > h2Card.getCardVal()){
+            return 1;
+        }
+        else if (h1Card.getCardVal() < h2Card.getCardVal()){
+            return -1;
+        }
+        else {
+            Card h1Card2 = this.getBestFive()[4];
+            Card h2Card2 = hr.getBestFive()[4];
+
+            if (h1Card2.getCardVal() > h2Card2.getCardVal()){
+                return 1;
+            }
+            else if (h1Card2.getCardVal() < h2Card2.getCardVal()){
+                return -1;
+            }
+            else {
+                return 0;
+            }
+        }
+    }
+
+    private int compareFlush(HandRanking hr) {
+        for (int x = 0; x < 5; x++) {
+            Card h1Card = this.getBestFive()[x];
+            Card h2Card = hr.getBestFive()[x];
+
+            if (h1Card.getCardVal() > h2Card.getCardVal()){
+                return 1;
+            }
+            else if (h1Card.getCardVal() < h2Card.getCardVal()){
+                return -1;
+            }
+            
+        }
+        return 0;
+    }
+
+    private int compareStraight(HandRanking hr) {
+        Card h1Card = this.getBestFive()[0];
+        Card h2Card = hr.getBestFive()[0];
+
+        if (h1Card.getCardVal() > h2Card.getCardVal()){
+            return 1;
+        }
+        else if (h1Card.getCardVal() < h2Card.getCardVal()){
+            return -1;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    private int compareTrips(HandRanking hr) {
+        for (int x = 0; x < 5; x++) {
+            Card h1Card = this.getBestFive()[x];
+            Card h2Card = hr.getBestFive()[x];
+
+            if (h1Card.getCardVal() > h2Card.getCardVal()){
+                return 1;
+            }
+            else if (h1Card.getCardVal() < h2Card.getCardVal()){
+                return 2;
+            }
+        }
+        return 0;
+    }
+
+    private int compareTwoPair(HandRanking hr) {
+        for (int x = 0; x < 5; x++) {
+            Card h1Card = this.getBestFive()[x];
+            Card h2Card = hr.getBestFive()[x];
+
+            if (h1Card.getCardVal() > h2Card.getCardVal()){
+                return 1;
+            }
+            else if (h1Card.getCardVal() < h2Card.getCardVal()){
+                return -1;
+            }
+        }
+        return 0;
+    }
+
+
+
     public int getNUMVALUES() {
         return NUMVALUES;
     }
