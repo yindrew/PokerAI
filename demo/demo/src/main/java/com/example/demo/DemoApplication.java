@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import java.util.Scanner;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -19,15 +21,23 @@ public class DemoApplication {
         SpringApplication.run(DemoApplication.class, args);
 
         // initializing the log 
-        Log l1 = new Log(Action.BET, 5);
-        Log l2 = new Log(Action.FOLD, 0);
+        Log l1 = new Log(Action.BET, 3);
+        Log l2 = new Log(Action.CALL, 3);
+        Log l3 = new Log(Action.CHECK, 0);
+        Log l4 = new Log(Action.BET, 2);
+        Log l5 = new Log(Action.FOLD, 0);
+
         GameLog log = new GameLog();
         log.addLog(l1);
         log.addLog(l2);
+        log.addLog(l3);
+        log.addLog(l4);
+        log.addLog(l5);
+
 
         // initializing the board and hand
         Card deckCard1 = new Card("9h");
-        Card deckCard2 = new Card("10d");
+        Card deckCard2 = new Card("Td");
         Card deckCard3 = new Card("Ks");
         Card handCard1 = new Card("Ad");
         Card handCard2 = new Card("As");
@@ -38,7 +48,15 @@ public class DemoApplication {
 
 
         DecisionController controller = new DecisionController();
-        controller.sendGameState(gameState);
+
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            String input = scanner.nextLine();
+            if (input.equals("send")) {
+
+                controller.sendGameState(gameState);
+            }
+        }
 
 
 

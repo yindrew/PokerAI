@@ -25,7 +25,7 @@ public class DecisionController {
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             HttpEntity<String> request = new HttpEntity<>(jsonPayload, headers);
-            String url = "http://127.0.0.1:5000/receive-game-state";  // Replace with the actual Python service URL
+            String url = "http://127.0.0.1:4999/receive-game-state";  // Replace with the actual Python service URL
             String action = restTemplate.postForObject(url, request, String.class);
             System.out.println(action);
         } catch (JsonProcessingException e) {

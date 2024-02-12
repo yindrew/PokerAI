@@ -7,21 +7,26 @@ import java.util.Collections;
  */
 public class Board implements Cloneable{
     private ArrayList<Card> boardCards;
+    private int size;
 
     //constructor
     public Board(Card[] cards) {
         boardCards = new ArrayList<Card>();
+        size = 0; 
         if (cards != null) {
             Collections.addAll(boardCards, cards);
+            size = boardCards.size();
         }
     }
 
     public void clearBoard() {
         boardCards.clear();
+        size = 0;
     }
 
     public void addCard(Card newCard) {
         boardCards.add(newCard);
+        size += 1;
     }
 
     public void addCards(Card[] cards) {
@@ -33,6 +38,10 @@ public class Board implements Cloneable{
      */
     public ArrayList<Card> getBoardCards() {
         return boardCards;
+    }
+
+    public int getSize() {
+        return size;
     }
 
     /**

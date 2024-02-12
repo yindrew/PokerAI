@@ -21,13 +21,7 @@ def make_decision(game_state):
     hand = game_state['hand']
     log = game_state['log']
     
-    print("This is the board: ")
-    print(board['boardCards'][0]['suit'])
-    print("This is the hand ")
-    print(hand)
-    print("This is the log: ")
-    print(log)
-    
+    parser(board, hand, log)
     
     return board['boardCards'][0]
     # Placeholder for AI decision logic
@@ -38,6 +32,29 @@ def send_decision(decision):
     url = 'http://localhost:8080/python-post'
     requests.post(url, json=decision)
 
+
+def parser(board, hand, log):
+    print("-----------------------------------------------------------")
+    boardArr = board['boardCards']
+    boardpy = []
+    handpy = []
+    logpy = []
+
+    # convet the board
+    for i in range(board['size']):
+        boardpy.append(boardArr[i]['value'] + boardArr[i]['suit'])
+
+    # convert the hand
+    handpy.append(hand['hand'][0]['value'] + hand['hand'][0]['suit'])
+    handpy.append(hand['hand'][1]['value'] + hand['hand'][1]['suit'])
+
+    # convert the log
+    for i in range(log['size']):
+        logpy.append((log['logs'][i]['action'], log['logs'][i]['size']))
+
+    print(handpy)
+    print(boardpy)
+    print(logpy)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=4999)
