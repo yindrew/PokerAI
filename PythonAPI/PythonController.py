@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
+import Testing
 
 app = Flask(__name__)
 
@@ -55,6 +56,28 @@ def parser(board, hand, log):
     print(handpy)
     print(boardpy)
     print(logpy)
+    
+    print(Testing.card_to_index(handpy[0]), Testing.card_to_index(handpy[1]))
+    print("-----------------------------------------------------------")
+
+
+def handleLog(logpy):
+    currentPotSize = 0
+    for i in logpy:
+        currentPotSize += i[1]
+        size = i[1] / currentPotSize
+        if (size == 0):
+            size = "0"
+        elif (size < .4):
+            size = "small"
+        elif (size < .8):
+            size = "normal"
+        elif (size < 2):
+            size = "big"
+        else:
+            size = "all in"
+        
+    
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=4999)

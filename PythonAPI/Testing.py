@@ -6,7 +6,6 @@ import torch
 # 5 dimensional embedding representation for each card
 # spades -> clubs -> diamonds -> hearts
 # 2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K, A
-
 class CardModel(nn.Module):
     def __init__(self):
         super(CardModel, self).__init__()
@@ -15,44 +14,37 @@ class CardModel(nn.Module):
     def forward(self, card_indices):
         return self.card_embedding(card_indices)
 
+def card_to_index(card):
+    # Define suits and ranks
+    suits = ['s', 'c', 'd', 'h']
+    ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
+    
+    # Split the card into rank and suit
+    rank, suit = card[:-1], card[-1]
+    
+    # Calculate index
+    suit_index = suits.index(suit)
+    rank_index = ranks.index(rank)
+    return suit_index * len(ranks) + rank_index
 
 
-# One-hot encoding for actions [FOLD, CHECK, CALL, BET, RAISE, ALL in]
-def encode_action(action_idx):
-    actions = [0] * 6  
-    actions[action_idx] = 1
-    return actions
+# One-hot encoding for action 
+def encode_action(action):
+    actions = ["FOLD", "CHECK", "CALL", "BET", "RAISE", "ALL IN"]
+    return [1 if a == action else 0 for a in actions]
 
-# One-hot encoding for action size [0, 1/3, 3/4, 2, all in]
-def encode_size(size_idx):
-    sizes = [0] * 5 
-    sizes[size_idx] = 1
-    return sizes
+# One-hot encoding for size
+def encode_size(size):
+    sizes = ["0", "small", "normal", "big", "all in"]
+    return [1 if a == size else 0 for a in sizes]
+
 
 
 # creating a log entry 
-def create_log_entry(action_idx, size_idx):
-    action_vector = encode_action(action_idx)
-    size_vector = encode_size(size_idx)
+def create_log_entry(action, size):
+    action_vector = encode_action(action)
+    size_vector = encode_size(size)
     return [action_vector] + [size_vector]
-
-testing = create_log_entry(2, 3)
-print(testing)
-
-
-
-
-def main():
-    # Your main code logic here
-    print("Hello, world!")
-    model = CardModel()
-    card_index = torch.tensor([0])
-    print(model.forward(card_index))
-
-
-if __name__ == "__main__":
-    main()
-
 
 
 # total input tensor [2 cards representing hand] + [5 cards representing board] + [n logs representing the game log]

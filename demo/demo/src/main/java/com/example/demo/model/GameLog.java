@@ -4,9 +4,11 @@ import java.util.List;
 
 public class GameLog {
     private List<Log> gameLog = new ArrayList<>();
+    private double potSize = 0;
 
     public void addLog(Log log) {
         gameLog.add(log);
+        potSize += log.getSize();
     }
 
     public List<Log> getLogs() {
@@ -15,6 +17,7 @@ public class GameLog {
 
     public void clearLog() {
         gameLog.clear();
+        potSize = 0;
     }
 
     public int getSize() {
