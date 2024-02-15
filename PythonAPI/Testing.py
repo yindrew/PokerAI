@@ -39,7 +39,6 @@ def encode_size(size):
     return [1 if a == size else 0 for a in sizes]
 
 
-
 # creating a log entry 
 def create_log_entry(action, size):
     action_vector = encode_action(action)

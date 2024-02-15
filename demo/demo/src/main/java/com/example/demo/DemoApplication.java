@@ -22,13 +22,16 @@ public class DemoApplication {
 
         // initializing the log 
         Log l1 = new Log(Action.BET, 3);
-        Log l2 = new Log(Action.CALL, 3);
+        Log l6 = new Log(Action.BET, 10);
+
+        Log l2 = new Log(Action.CALL, 10);
         Log l3 = new Log(Action.CHECK, 0);
         Log l4 = new Log(Action.BET, 2);
         Log l5 = new Log(Action.FOLD, 0);
 
         GameLog log = new GameLog();
         log.addLog(l1);
+        log.addLog(l6);
         log.addLog(l2);
         log.addLog(l3);
         log.addLog(l4);

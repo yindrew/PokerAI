@@ -51,11 +51,11 @@ def parser(board, hand, log):
 
     # convert the log
     for i in range(log['size']):
-        logpy.append((log['logs'][i]['action'], log['logs'][i]['size']))
+        logpy.append([log['logs'][i]['action'], log['logs'][i]['size']])
 
     print(handpy)
     print(boardpy)
-    print(logpy)
+    handleLog(logpy)
     
     print(Testing.card_to_index(handpy[0]), Testing.card_to_index(handpy[1]))
     print("-----------------------------------------------------------")
@@ -63,6 +63,9 @@ def parser(board, hand, log):
 
 def handleLog(logpy):
     currentPotSize = 0
+    preflop = True
+    
+    
     for i in logpy:
         currentPotSize += i[1]
         size = i[1] / currentPotSize
@@ -76,6 +79,13 @@ def handleLog(logpy):
             size = "big"
         else:
             size = "all in"
+            
+        if preflop:
+            size = "normal"
+        if i[0] == "CALL":
+            preflop = False
+        i[1] = size
+    print(logpy)
         
     
 
