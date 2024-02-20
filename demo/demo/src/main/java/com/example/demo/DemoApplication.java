@@ -26,8 +26,8 @@ public class DemoApplication {
 
         Log l2 = new Log(Action.CALL, 10);
         Log l3 = new Log(Action.CHECK, 0);
-        Log l4 = new Log(Action.BET, 2);
-        Log l5 = new Log(Action.FOLD, 0);
+        Log l4 = new Log(Action.BET, 15);
+        Log l5 = new Log(Action.ALL_IN, 90);
 
         GameLog log = new GameLog();
         log.addLog(l1);

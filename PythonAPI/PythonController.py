@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
-import Testing
+import Encoder
 
 app = Flask(__name__)
 
@@ -57,34 +57,42 @@ def parser(board, hand, log):
     print(boardpy)
     handleLog(logpy)
     
-    print(Testing.card_to_index(handpy[0]), Testing.card_to_index(handpy[1]))
+    
     print("-----------------------------------------------------------")
+    ts = Encoder.input_to_tensor(handpy, boardpy, logpy, 15)
+    print(ts)
+    print(ts.size())
 
 
 def handleLog(logpy):
-    currentPotSize = 0
+    currentPotSize = .5
     preflop = True
     
     
     for i in logpy:
-        currentPotSize += i[1]
-        size = i[1] / currentPotSize
-        if (size == 0):
+        temp = i[1]
+        size = temp / currentPotSize
+        if i[0] == "all in":
+            size = "all in"
+        elif (size == 0):
             size = "0"
         elif (size < .4):
             size = "small"
         elif (size < .8):
             size = "normal"
-        elif (size < 2):
-            size = "big"
         else:
-            size = "all in"
-            
+            size = "big"
+
+        # everything that happens preflop will be medium size    
         if preflop:
             size = "normal"
         if i[0] == "CALL":
             preflop = False
+
+        #update the size to be categorical
         i[1] = size
+        currentPotSize += temp
+
     print(logpy)
         
     
