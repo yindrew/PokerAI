@@ -27,7 +27,7 @@ class PokerGRU(nn.Module):
         self.fc_decision = nn.Linear(hidden_size, 6)  # 6 actions [fold, check, call, bet, raise, all in]
 
         # Size output layer
-        self.fc_size = nn.Linear(hidden_size, 5)  # 5 sizes [0, ]
+        self.fc_size = nn.Linear(hidden_size, 5)  # 5 sizes [0, small, medium, big, all in]
 
     def forward(self, x):
         # Initializing hidden state for first input

@@ -52,11 +52,15 @@ def encode_action_size(action, size):
 
 def input_to_tensor(hand, board, game_log, max_log_length):
     # Encode hand and board
-    hand_embeddings = [encode_card(card) for card in hand]
-    board_embeddings = torch.cat([encode_card(card) if card else torch.zeros(1, 5) for card in board + [None] * (5 - len(board))])
+    all_card_indices = torch.tensor([encode_card(card) for card in hand] + [encode_card(card) for card in board] + [-1] * (5 - len(board)))
+
 
     # Encode game log
     log_embeddings = torch.cat([encode_action_size(action, size) for action, size in game_log] + [torch.zeros(11) for _ in range(max_log_length - len(game_log))]).flatten()
 
     # Concatenate all embeddings
-    return torch.cat([hand_embeddings, board_embeddings, log_embeddings])
+    return torch.cat([all_card_indices, log_embeddings]).flatten()
+
+# Example usage
+# card_model = YourCardModel()
+# input_tensor = input_to_tensor(hand, board, game_log, max_log_length, card_model)
