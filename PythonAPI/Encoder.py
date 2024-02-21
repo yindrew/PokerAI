@@ -3,16 +3,6 @@ import torch.nn as nn
 import torch
 
 
-# 5 dimensional embedding representation for each card
-# spades -> clubs -> diamonds -> hearts
-# 2, 3, 4, 5, 6, 7, 8, 9, T, J, Q, K, A
-class CardModel(nn.Module):
-    def __init__(self):
-        super(CardModel, self).__init__()
-        self.card_embedding= nn.Embedding(52, 5)  # 52 cards, 5 dimension embedding
-
-    def forward(self, card_indices):
-        return self.card_embedding(card_indices)
 
 
 # get the embedding of the card
@@ -27,11 +17,10 @@ def encode_card(card):
     # Calculate index
     suit_index = suits.index(suit)
     rank_index = ranks.index(rank)
-    card_index = torch.tensor([suit_index * len(ranks) + rank_index])
 
     # Create an instance of CardModel and get the embedding
-    model = CardModel()
-    return model(card_index)
+    return suit_index * len(ranks) + rank_index
+
 
 
 
@@ -63,8 +52,8 @@ def encode_action_size(action, size):
 
 def input_to_tensor(hand, board, game_log, max_log_length):
     # Encode hand and board
-    hand_embeddings = torch.cat([encode_card(card) for card in hand]).flatten()
-    board_embeddings = torch.cat([encode_card(card) if card else torch.zeros(1, 5) for card in board + [None] * (5 - len(board))]).flatten()
+    hand_embeddings = [encode_card(card) for card in hand]
+    board_embeddings = torch.cat([encode_card(card) if card else torch.zeros(1, 5) for card in board + [None] * (5 - len(board))])
 
     # Encode game log
     log_embeddings = torch.cat([encode_action_size(action, size) for action, size in game_log] + [torch.zeros(11) for _ in range(max_log_length - len(game_log))]).flatten()
