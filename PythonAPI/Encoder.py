@@ -23,26 +23,13 @@ def encode_card(card):
 
 
 
+ # [fold, call, check, bet small, bet medium, bet big, bet all in, raise small, raise medium, raise big, raise all in, all in]
 
-# One-hot encoding for action 
+# One-hot encoding for decision  
 def encode_action(action):
-    actions = ["FOLD", "CHECK", "CALL", "BET", "RAISE", "ALL IN"]
-    return [1 if a == action else 0 for a in actions]
+    actions = ["FOLD", "CHECK", "CALL", "BET SMALL", "BET MEDIUM", "BET BIG", "BET ALL IN", "RAISE SMALL", "RAISE MEDIUM", "RAISE BIG", "RAISE ALL IN", "ALL IN"]
+    return torch.tensor([1 if a == action else 0 for a in actions])
 
-# One-hot encoding for size
-def encode_size(size):
-    sizes = ["0", "small", "normal", "big", "all in"]
-    return [1 if a == size else 0 for a in sizes]
-
-def encode_action_size(action, size):
-    # Get one-hot encoded vectors for action and size
-    action_vector = encode_action(action)
-    size_vector = encode_size(size)
-
-    # Concatenate the action and size vectors
-    action_size_vector = action_vector + size_vector
-
-    return torch.tensor(action_size_vector)
 
 # total input tensor [2 cards representing hand] + [5 cards representing board] + [n logs representing the game log]
 # Each card is represented as a 5 dimensional embedding
@@ -50,17 +37,13 @@ def encode_action_size(action, size):
 # input tensor will have 35(7 cards * 5 dimensinoal embedding) representing the players hand and 165 (15 total actions * 11 action + size) representing the game log
 # 200 total input vectors
 
-def input_to_tensor(hand, board, game_log, max_log_length):
+def input_to_tensor(hand, board, game_log):
     # Encode hand and board
     all_card_indices = torch.tensor([encode_card(card) for card in hand] + [encode_card(card) for card in board] + [-1] * (5 - len(board)))
 
 
     # Encode game log
-    log_embeddings = torch.cat([encode_action_size(action, size) for action, size in game_log] + [torch.zeros(11) for _ in range(max_log_length - len(game_log))]).flatten()
+    log_embeddings = torch.cat([encode_action(action) for action in game_log] + [torch.zeros(12) for _ in range(15 - len(game_log))]).flatten()
 
     # Concatenate all embeddings
     return torch.cat([all_card_indices, log_embeddings]).flatten()
-
-# Example usage
-# card_model = YourCardModel()
-# input_tensor = input_to_tensor(hand, board, game_log, max_log_length, card_model)

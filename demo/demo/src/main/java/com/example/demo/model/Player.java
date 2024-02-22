@@ -25,7 +25,7 @@ public class Player {
     public Log getAction(GameLog log) {
 
         // change to call the python service to get a action
-        return new Log(Action.RAISE, 5);
+        return new Log(Action.RAISE_MEDIUM, 5);
     }
 
     public void setHand(Hand h) {

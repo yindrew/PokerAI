@@ -21,12 +21,12 @@ public class DemoApplication {
         SpringApplication.run(DemoApplication.class, args);
 
         // initializing the log 
-        Log l1 = new Log(Action.BET, 3);
-        Log l6 = new Log(Action.BET, 10);
+        Log l1 = new Log(Action.BET_MEDIUM, 3);
+        Log l6 = new Log(Action.BET_MEDIUM, 10);
 
         Log l2 = new Log(Action.CALL, 10);
         Log l3 = new Log(Action.CHECK, 0);
-        Log l4 = new Log(Action.BET, 15);
+        Log l4 = new Log(Action.BET_SMALL, 15);
         Log l5 = new Log(Action.ALL_IN, 90);
 
         GameLog log = new GameLog();

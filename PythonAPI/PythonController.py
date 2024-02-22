@@ -35,13 +35,11 @@ def send_decision(decision):
 
 
 def parser(board, hand, log):
-    print("-----------------------------------------------------------")
     boardArr = board['boardCards']
     boardpy = []
     handpy = []
     logpy = []
-
-    # convet the board
+    # convert the board
     for i in range(board['size']):
         boardpy.append(boardArr[i]['value'] + boardArr[i]['suit'])
 
@@ -51,7 +49,7 @@ def parser(board, hand, log):
 
     # convert the log
     for i in range(log['size']):
-        logpy.append([log['logs'][i]['action'], log['logs'][i]['size']])
+        logpy.append(log['logs'][i]['action'])
 
     print(handpy)
     print(boardpy)

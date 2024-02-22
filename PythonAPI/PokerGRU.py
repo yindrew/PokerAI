@@ -16,40 +16,41 @@ class CardModel(nn.Module):
 
 
 class PokerGRU(nn.Module):
-    def __init__(self, input_size, hidden_size, num_layers):
+    def __init__(self, hidden_size, num_layers):
         super(PokerGRU, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.card_embeddings = nn.Embedding(52, 5) # 52 cards, 5 dimension embedding
-        self.gru = nn.GRU(input_size, hidden_size, num_layers, batch_first=True)
+        self.gru = nn.GRU(200, hidden_size, num_layers, batch_first=True) # 35 from cards (7 cards * 5 dimension) + (11 action and embedding * 15 total actions allowed)
+
 
         # Decision output layer
-        self.fc_decision = nn.Linear(hidden_size, 6)  # 6 actions [fold, check, call, bet, raise, all in]
+        self.output = nn.Linear(hidden_size, 12)  # 12 outputs  [fold, call, check, bet small, bet medium, bet big, bet all in, raise small, raise medium, raise big, raise all in, all in]
 
-        # Size output layer
-        self.fc_size = nn.Linear(hidden_size, 5)  # 5 sizes [0, small, medium, big, all in]
 
-    def forward(self, x):
-        # Initializing hidden state for first input
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
+    def forward(self, input_tensor):
+        
+        # update the input tensor to use embeddings for card values instead of index
+        card_indices = input_tensor[:7]
+        game_log_data = input_tensor[7:]
+        card_embeddings = torch.cat([self.card_embeddings(index.unsqueeze(0)) if index != -1 else torch.zeros(1, 5) for index in card_indices])
+        input_tensor = torch.cat([card_embeddings.flatten(), game_log_data]).unsqueeze(0)  # Add batch dimension
 
         # Forward propagate the GRU
-        out, _ = self.gru(x, h0)
+        out, _ = self.gru(input_tensor)
 
-        # Decisions
+        # Decision output
         decision_out = self.fc_decision(out[:, -1, :])
+        # If using CrossEntropyLoss, remove softmax here
         decision_probs = F.softmax(decision_out, dim=1)
 
-        # Sizes
-        size_out = self.fc_size(out[:, -1, :])
-        size_probs = F.softmax(size_out, dim=1)
-
-        return decision_probs, size_probs
+        return decision_probs
 
 
-input_size = 200  # Length of your input vector
+
+
 hidden_size = 256  # Can be adjusted
 num_layers = 3  # number of hidden layers
 
 # Create the model
-model = PokerGRU(input_size, hidden_size, num_layers)
+model = PokerGRU(hidden_size, num_layers)
