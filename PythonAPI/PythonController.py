@@ -69,7 +69,6 @@ def handleLog(logpy):
     
     for i in logpy:
         temp = i[1]
-        size = temp / currentPotSize
         if i[0] == "all in":
             size = "all in"
         elif (size == 0):

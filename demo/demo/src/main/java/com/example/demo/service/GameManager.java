@@ -183,7 +183,14 @@ public class GameManager {
                     currentState = GameState.FLOP;
                 }
                 break;
-            case RAISE:
+            case RAISE_ALL_IN:
+            case RAISE_BIG:
+            case RAISE_MEDIUM:
+            case RAISE_SMALL:
+            case BET_ALL_IN:
+            case BET_LARGE:
+            case BET_MEDIUM:
+            case BET_SMALL:
                 handleRaise(currentAction);
                 currentState = GameState.PREFLOP;
                 break;
@@ -195,6 +202,7 @@ public class GameManager {
                 break;
         }
         advanceGame();
+        scanner.close();
     }
 
     private void handleFlop() throws Exception {
@@ -223,8 +231,15 @@ public class GameManager {
                 handleCall(currentAction);
                 currentState = GameState.TURN;
                 break;
-            case RAISE:
-                handleRaise(currentAction);
+            case RAISE_ALL_IN:
+            case RAISE_BIG:
+            case RAISE_MEDIUM:
+            case RAISE_SMALL:
+            case BET_ALL_IN:
+            case BET_LARGE:
+            case BET_MEDIUM:
+            case BET_SMALL:                
+            handleRaise(currentAction);
                 currentState = GameState.FLOP;
                 break;
             case CHECK:
@@ -240,6 +255,7 @@ public class GameManager {
                 break;
         }
         advanceGame();
+        scanner.close();
         // Handle Flop actions
     }
 
@@ -270,7 +286,14 @@ public class GameManager {
                 handleCall(currentAction);
                 currentState = GameState.RIVER;
                 break;
-            case RAISE:
+            case RAISE_ALL_IN:
+            case RAISE_BIG:
+            case RAISE_MEDIUM:
+            case RAISE_SMALL:
+            case BET_ALL_IN:
+            case BET_LARGE:
+            case BET_MEDIUM:
+            case BET_SMALL: 
                 handleRaise(currentAction);
                 currentState = GameState.TURN;
                 break;
@@ -287,6 +310,8 @@ public class GameManager {
                 break;
         }
         advanceGame();
+        scanner.close();
+
 
     }
 
@@ -316,7 +341,14 @@ public class GameManager {
                 handleCall(currentAction);
                 currentState = GameState.SHOWDOWN;
                 break;
-            case RAISE:
+            case RAISE_ALL_IN:
+            case RAISE_BIG:
+            case RAISE_MEDIUM:
+            case RAISE_SMALL:
+            case BET_ALL_IN:
+            case BET_LARGE:
+            case BET_MEDIUM:
+            case BET_SMALL: 
                 handleRaise(currentAction);
                 currentState = GameState.RIVER;
                 break;
@@ -333,7 +365,7 @@ public class GameManager {
                 break;
         }
         advanceGame();
-
+        scanner.close();
     }
 
     private void handleRaise(Log action) throws Exception {

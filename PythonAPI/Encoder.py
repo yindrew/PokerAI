@@ -2,7 +2,11 @@
 import torch.nn as nn
 import torch
 
-
+# total input tensor [2 cards representing hand] + [5 cards representing board] + [n logs representing the game log]
+# Each card is represented as a 5 dimensional embedding
+# each log has a action (6 possibilities) and a size (5 possibilities)
+# input tensor will have 35(7 cards * 5 dimensinoal embedding) representing the players hand and 165 (15 total actions * 11 action + size) representing the game log
+# 200 total input vectors
 
 
 # get the embedding of the card
@@ -31,14 +35,11 @@ def encode_action(action):
     return torch.tensor([1 if a == action else 0 for a in actions])
 
 
-# total input tensor [2 cards representing hand] + [5 cards representing board] + [n logs representing the game log]
-# Each card is represented as a 5 dimensional embedding
-# each log has a action (6 possibilities) and a size (5 possibilities)
-# input tensor will have 35(7 cards * 5 dimensinoal embedding) representing the players hand and 165 (15 total actions * 11 action + size) representing the game log
-# 200 total input vectors
 
+# converts the hand, board and gamelog  
 def input_to_tensor(hand, board, game_log):
-    # Encode hand and board
+
+    # Encode hand and board, pads the board with -1 if not filled
     all_card_indices = torch.tensor([encode_card(card) for card in hand] + [encode_card(card) for card in board] + [-1] * (5 - len(board)))
 
 
