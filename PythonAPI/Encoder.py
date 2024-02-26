@@ -9,27 +9,24 @@ import torch
 # 200 total input vectors
 
 
-# get the embedding of the card
+#get the index of the card
 def encode_card(card):
     # Define suits and ranks
     suits = ['s', 'c', 'd', 'h']
     ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
-    
-    # Split the card into rank and suit
     rank, suit = card[0], card[1]
     
     # Calculate index
     suit_index = suits.index(suit)
     rank_index = ranks.index(rank)
 
-    # Create an instance of CardModel and get the embedding
+    
     return suit_index * len(ranks) + rank_index
 
 
 
- # [fold, call, check, bet small, bet medium, bet big, bet all in, raise small, raise medium, raise big, raise all in, all in]
-
-# One-hot encoding for decision  
+ 
+# One-hot encoding for decision and action
 def encode_action(action):
     actions = ["FOLD", "CHECK", "CALL", "BET SMALL", "BET MEDIUM", "BET BIG", "BET ALL IN", "RAISE SMALL", "RAISE MEDIUM", "RAISE BIG", "RAISE ALL IN", "ALL IN"]
     return torch.tensor([1 if a == action else 0 for a in actions])

@@ -1,98 +1,64 @@
 from flask import Flask, request, jsonify
 import requests
 import Encoder
+from PokerGRU import PokerGRU
 
 app = Flask(__name__)
 
 
 # when you recieve a game state, we will get the game state and convert it into a decision.
-@app.route('/receive-game-state', methods=['POST'])
+@app.route("/receive-game-state", methods=["POST"])
 def receive_game_state():
     game_state = request.json
-    
-    print(game_state)
     decision = make_decision(game_state)
-    #send_decision(decision)
+    # send_decision(decision)
     return jsonify(decision)
 
 
-# make a decision based on the current game state
+# make a decision based on the current game state # to be done
 def make_decision(game_state):
-    board = game_state['board']
-    hand = game_state['hand']
-    log = game_state['log']
-    
-    parser(board, hand, log)
-    
-    return board['boardCards'][0]
-    # Placeholder for AI decision logic
-    return game_state
+    input_tensor = Encoder.input_to_tensor(*parser(game_state["board"], game_state["hand"], game_state["log"]))
+
+    action, action_probs = PokerGRU(256, 3)(input_tensor)
+
+    actions = [
+        "FOLD",
+        "CHECK",
+        "CALL",
+        "BET SMALL",
+        "BET MEDIUM",
+        "BET BIG",
+        "BET ALL IN",
+        "RAISE SMALL",
+        "RAISE MEDIUM",
+        "RAISE BIG",
+        "RAISE ALL IN",
+        "ALL IN",
+    ]
+    print(action_probs)
+    return actions[action]
+
 
 # send the decision back to the java side for them to handle
 def send_decision(decision):
-    url = 'http://localhost:8080/python-post'
+    url = "http://localhost:8080/python-post"
     requests.post(url, json=decision)
 
 
 def parser(board, hand, log):
-    boardArr = board['boardCards']
-    boardpy = []
-    handpy = []
-    logpy = []
-    # convert the board
-    for i in range(board['size']):
-        boardpy.append(boardArr[i]['value'] + boardArr[i]['suit'])
+    # Extract board cards
+    board_cards = [
+        card["value"] + card["suit"] for card in board["boardCards"][: board["size"]]
+    ]
 
-    # convert the hand
-    handpy.append(hand['hand'][0]['value'] + hand['hand'][0]['suit'])
-    handpy.append(hand['hand'][1]['value'] + hand['hand'][1]['suit'])
+    # Extract hand cards
+    hand_cards = [card["value"] + card["suit"] for card in hand["hand"]]
 
-    # convert the log
-    for i in range(log['size']):
-        logpy.append(log['logs'][i]['action'])
+    # Extract log actions
+    log_actions = [log_entry["action"] for log_entry in log["logs"][: log["size"]]]
 
-    print(handpy)
-    print(boardpy)
-    handleLog(logpy)
-    
-    
-    print("-----------------------------------------------------------")
-    ts = Encoder.input_to_tensor(handpy, boardpy, logpy, 15)
-    print(ts)
-    print(ts.size())
+    return board_cards, hand_cards, log_actions
 
 
-def handleLog(logpy):
-    currentPotSize = .5
-    preflop = True
-    
-    
-    for i in logpy:
-        temp = i[1]
-        if i[0] == "all in":
-            size = "all in"
-        elif (size == 0):
-            size = "0"
-        elif (size < .4):
-            size = "small"
-        elif (size < .8):
-            size = "normal"
-        else:
-            size = "big"
-
-        # everything that happens preflop will be medium size    
-        if preflop:
-            size = "normal"
-        if i[0] == "CALL":
-            preflop = False
-
-        #update the size to be categorical
-        i[1] = size
-        currentPotSize += temp
-
-    print(logpy)
-        
-    
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=4999)
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=4999)
