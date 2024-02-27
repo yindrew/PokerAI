@@ -161,6 +161,8 @@ public class GameManager {
             case BET_SMALL:
             case BET_MEDIUM:
             case BET_BIG:
+                legalMoves = new int[]{1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1};
+                    break;
             case BET_ALL_IN:
                 legalMoves = new int[]{1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0};
                 break;
@@ -279,6 +281,9 @@ public class GameManager {
                 handleRiver();
                 break;
             case SHOWDOWN:
+                while (board.getBoardCards().size() != 5) {
+                    deal();
+                }
                 currentState = GameState.GAMEOVER;
                 Player temp = determineWinner();
                 if (temp == null) {
@@ -353,6 +358,9 @@ public class GameManager {
                 } else {
                     currentState = GameState.FLOP;
                 }
+                if (players[0].getStack() == 0 && players[1].getStack() == 0) {
+                    currentState = GameState.SHOWDOWN;
+                }
                 break;
             case RAISE_ALL_IN:
             case RAISE_BIG:
@@ -405,6 +413,9 @@ public class GameManager {
             case CALL:
                 handleCall(currentAction);
                 currentState = GameState.TURN;
+                if (players[0].getStack() == 0 && players[1].getStack() == 0) {
+                    currentState = GameState.SHOWDOWN;
+                }
                 break;
             case RAISE_ALL_IN:
             case BET_ALL_IN:
@@ -466,6 +477,9 @@ public class GameManager {
             case CALL:
                 handleCall(currentAction);
                 currentState = GameState.RIVER;
+                if (players[0].getStack() == 0 && players[1].getStack() == 0) {
+                    currentState = GameState.SHOWDOWN;
+                }
                 break;
             case RAISE_ALL_IN:
             case RAISE_BIG:
@@ -553,10 +567,6 @@ public class GameManager {
         scanner.close();
     }
 
-    private void handleAllIn(Log action) {
-        gameLog.addLog(action);
-        
-    }
 
     private void handleRaise(Log action) throws Exception {
         if (players[currentPlayerIndex].getStack() < action.getSize()) {
