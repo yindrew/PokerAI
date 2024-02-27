@@ -47,13 +47,32 @@ public class GameManager {
 
     }
 
+    public int[] betOverPot(int[] legalMoves) {
+        for (int i = 0; i < legalMoves.length; i++) {
+            if (legalMoves[i] == 1) {
+                Action action = Action.values()[i];
+                if (properSize(action) >= players[currentPlayerIndex].getStack()){
+                    legalMoves[i] = 0;
+                }
+            }
+        }
+
+        return legalMoves;
+    }
+
 
     public double properSize(Action action){
+        if (action == Action.RAISE_ALL_IN) {
+            return players[currentPlayerIndex].getStack();
+        }
         if (currentState == GameState.PREFLOP) {
             if (action == Action.FOLD) {
                 return 0;
             }
             else if (action == Action.CALL) {
+                if (gameLog.getLogs().get(gameLog.getSize() - 1).getAction() == Action.RAISE_ALL_IN){
+                    return players[currentPlayerIndex].getStack();
+                }
                 if (gameLog.getSize() == 1) {
                     return 1.5;
                 }
@@ -82,20 +101,53 @@ public class GameManager {
                 }
             }
         }
+        else{
+            Log lastAction;
+            switch (action) {
+                case FOLD:
+                case CHECK: 
+                    return 0;
+                case CALL:
+                    lastAction = gameLog.getLogs().get(gameLog.getSize() - 1);
+                    return lastAction.getSize();
+                case BET_SMALL:
+                    return potSize / 4;
+                case BET_MEDIUM:
+                    return potSize * 3 / 4;
+                case BET_BIG:
+                    return potSize * 2;
+                case BET_ALL_IN:
+                    return players[currentPlayerIndex].getStack();
+                case RAISE_SMALL:
+                    lastAction = gameLog.getLogs().get(gameLog.getSize() - 1);
+                    return lastAction.getSize() * 2.2;
+                case RAISE_MEDIUM:
+                    lastAction = gameLog.getLogs().get(gameLog.getSize() - 1);
+                    return lastAction.getSize() * 3.5;
+                case RAISE_BIG:
+                    lastAction = gameLog.getLogs().get(gameLog.getSize() - 1);
+                    return lastAction.getSize() * 4.4;
+                case RAISE_ALL_IN:
+                    return players[currentPlayerIndex].getStack();
+            }
+        }
         return 0;
-
     }
 
 
     // returns all legal moves based on the last action that happened
     public int[] legalActions() {
+        Log lastMove;
         if (gameLog.getSize() == 0){
             return new int[]{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0};
         }
+        lastMove = gameLog.getLogs().get(gameLog.getSize() - 1);
         if (currentState == GameState.PREFLOP) {
-            return new int[]{1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0};
+            if (lastMove.getAction() == Action.RAISE_ALL_IN) {
+                return new int[]{1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0};
+            }
+            return new int[]{1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1};
         }
-        Log lastMove = gameLog.getLogs().get(gameLog.getSize() - 1);
         int[] legalMoves = new int[12];
 
         switch (lastMove.getAction()) {
@@ -110,14 +162,18 @@ public class GameManager {
             case BET_MEDIUM:
             case BET_BIG:
             case BET_ALL_IN:
+                legalMoves = new int[]{1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
             case RAISE_SMALL:
             case RAISE_MEDIUM:
             case RAISE_BIG:
-            case RAISE_ALL_IN:
                 legalMoves = new int[]{1, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1};
                 break;
+            case RAISE_ALL_IN:
+                legalMoves = new int[]{1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0};
+                break;
         }
-
+        legalMoves = betOverPot(legalMoves);
         return legalMoves;
     }
 
@@ -268,7 +324,7 @@ public class GameManager {
         // System.out.println(players[currentPlayerIndex].getName() + ", enter your size: ");
         // double inputSize = Double.parseDouble(scanner.nextLine());
         double inputSize = properSize(Action.valueOf(inputAction));
-
+        
 
         Log currentAction = players[currentPlayerIndex].getAction(inputAction, inputSize);
 
@@ -329,8 +385,9 @@ public class GameManager {
             System.out.println("illegal action, please try again" + ", enter your action (" + getLegalActionsString(legalMoves) + ")");
             inputAction = scanner.nextLine().toUpperCase();
         }
-        System.out.println(players[currentPlayerIndex].getName() + ", enter your size: ");
-        double inputSize = Double.parseDouble(scanner.nextLine());
+
+        double inputSize = properSize(Action.valueOf(inputAction));
+        
         Log currentAction = players[currentPlayerIndex].getAction(inputAction, inputSize);
 
         // Log currentAction = players[currentPlayerIndex].getAction(gameLog);
@@ -350,10 +407,12 @@ public class GameManager {
                 currentState = GameState.TURN;
                 break;
             case RAISE_ALL_IN:
+            case BET_ALL_IN:
+                break;
+
             case RAISE_BIG:
             case RAISE_MEDIUM:
             case RAISE_SMALL:
-            case BET_ALL_IN:
             case BET_BIG:
             case BET_MEDIUM:
             case BET_SMALL:                
@@ -388,8 +447,8 @@ public class GameManager {
             System.out.println("illegal action, please try again" + ", enter your action (" + getLegalActionsString(legalMoves) + ")");
             inputAction = scanner.nextLine().toUpperCase();
         }
-        System.out.println(players[currentPlayerIndex].getName() + ", enter your size: ");
-        double inputSize = Double.parseDouble(scanner.nextLine());
+        double inputSize = properSize(Action.valueOf(inputAction));
+
         Log currentAction = players[currentPlayerIndex].getAction(inputAction, inputSize);
 
         // Log currentAction = players[currentPlayerIndex].getAction(gameLog);
@@ -447,8 +506,8 @@ public class GameManager {
             System.out.println("illegal action, please try again" + ", enter your action (" + getLegalActionsString(legalMoves) + ")");
             inputAction = scanner.nextLine().toUpperCase();
         }
-        System.out.println(players[currentPlayerIndex].getName() + ", enter your size: ");
-        double inputSize = Double.parseDouble(scanner.nextLine());
+        double inputSize = properSize(Action.valueOf(inputAction));        
+
         Log currentAction = players[currentPlayerIndex].getAction(inputAction, inputSize);
 
         // Log currentAction = players[currentPlayerIndex].getAction(gameLog);
@@ -492,6 +551,11 @@ public class GameManager {
         }
         advanceGame();
         scanner.close();
+    }
+
+    private void handleAllIn(Log action) {
+        gameLog.addLog(action);
+        
     }
 
     private void handleRaise(Log action) throws Exception {

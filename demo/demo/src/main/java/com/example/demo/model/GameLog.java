@@ -32,5 +32,9 @@ public class GameLog {
         return sBuilder.toString();
     }
 
+    public double getPotSize() {
+        return potSize;
+    }
+
 }
 
