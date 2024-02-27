@@ -23,6 +23,23 @@ public class GameState {
     public GameLog getLog() {
         return log;
     }
+
+
+    public void setBoard(Board b) {
+        board = b;
+    }
+
+    public void setHand(Hand h) {
+        hand = h;
+    }
+
+    public void setLog(GameLog l) {
+        log = l;
+    }
+
+    public String toString() {
+        return "The board is " + board.toString() + " The hand is " + hand.toString() + " the log is " + log.toString();
+    }
     
     
 }

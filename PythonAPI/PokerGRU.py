@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import Encoder as encoder
 
 
 # 5 dimensional embedding representation for each card
@@ -13,11 +12,11 @@ class PokerGRU(nn.Module):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.card_embeddings = nn.Embedding(52, 5) # 52 cards, 5 dimension embedding
-        self.gru = nn.GRU(216, hidden_size, num_layers, batch_first=True) # 35 from cards (7 cards * 5 dimension) + (12 action and embedding * 15 total actions allowed)
+        self.gru = nn.GRU(200, hidden_size, num_layers, batch_first=True) # 35 from cards (7 cards * 5 dimension) + (11 action and embedding * 15 total actions allowed)
 
 
         # Decision output layer
-        self.output = nn.Linear(hidden_size, 12)  # 12 outputs  [fold, call, check, bet small, bet medium, bet big, bet all in, raise small, raise medium, raise big, raise all in, all in]
+        self.output = nn.Linear(hidden_size, 11)  # 12 outputs  [fold, call, check, bet small, bet medium, bet big, bet all in, raise small, raise medium, raise big, raise all in, all in]
 
 
     def forward(self, input_tensor):

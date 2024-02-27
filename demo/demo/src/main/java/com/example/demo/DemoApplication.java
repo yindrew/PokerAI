@@ -27,7 +27,7 @@ public class DemoApplication {
         Log l2 = new Log(Action.CALL, 10);
         Log l3 = new Log(Action.CHECK, 0);
         Log l4 = new Log(Action.BET_SMALL, 15);
-        Log l5 = new Log(Action.ALL_IN, 90);
+        Log l5 = new Log(Action.BET_ALL_IN, 90);
 
         GameLog log = new GameLog();
         log.addLog(l1);
@@ -57,7 +57,8 @@ public class DemoApplication {
             String input = scanner.nextLine();
             if (input.equals("send")) {
 
-                controller.sendGameState(gameState);
+                String action = controller.sendGameState(gameState);
+                System.out.println(action);
             }
         }
 

@@ -1,6 +1,8 @@
 package com.example.demo.controller;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.model.Action;
 import com.example.demo.model.GameState;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DecisionController {
 
 
-    public void sendGameState(GameState gameState) {
+    public String sendGameState(GameState gameState) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonPayload = objectMapper.writeValueAsString(gameState);
@@ -27,10 +29,12 @@ public class DecisionController {
             HttpEntity<String> request = new HttpEntity<>(jsonPayload, headers);
             String url = "http://127.0.0.1:4999/receive-game-state";  // Replace with the actual Python service URL
             String action = restTemplate.postForObject(url, request, String.class);
-            System.out.println(action);
+            action = action.toUpperCase();
+            return action;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
+        return "error";
     }
 
 

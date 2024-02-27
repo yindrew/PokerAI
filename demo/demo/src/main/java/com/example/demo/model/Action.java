@@ -6,12 +6,11 @@ public enum Action {
     CALL,
     BET_SMALL,
     BET_MEDIUM,
-    BET_LARGE,
+    BET_BIG,
     BET_ALL_IN,
     RAISE_SMALL,
     RAISE_MEDIUM,
     RAISE_BIG,
-    RAISE_ALL_IN,
-    ALL_IN
+    RAISE_ALL_IN
 }
 

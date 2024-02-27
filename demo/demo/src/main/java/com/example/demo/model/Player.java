@@ -1,19 +1,29 @@
 package com.example.demo.model;
 
+import java.util.Arrays;
+
+import com.example.demo.controller.DecisionController;
+
 public class Player {
     private Hand hand;
     private GameLog gameLog;
     private double stack;
     private String name;
-    
+    private DecisionController decisionController;
+    private GameState gameState;
 
     public Player() {
+        gameState = new GameState(null, null, null);
 
     }
 
     public Player(String name) {
         this.name = name;
         this.stack = 100;
+        decisionController = new DecisionController();
+        gameState = new GameState(null, null, null);
+        hand = new Hand("AdAh");
+
     }
 
 
@@ -22,14 +32,22 @@ public class Player {
         return new Log(newAction, size);
     }
 
-    public Log getAction(GameLog log) {
+    public Log getAction(GameLog log, Board board) {
 
-        // change to call the python service to get a action
-        return new Log(Action.RAISE_MEDIUM, 5);
+        // update the board
+        gameState.setBoard(board);
+        gameState.setLog(log);
+
+        String action = decisionController.sendGameState(gameState);
+        action = action.replace(" ", "_").replace("\"", "").trim();
+
+        return new Log(Action.valueOf(action), 0);
+
     }
 
     public void setHand(Hand h) {
         hand = h;
+        gameState.setHand(h);
     } 
 
     public Hand getHand() {

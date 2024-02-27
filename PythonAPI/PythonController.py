@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
-import requests
-import Encoder
-from PokerGRU import PokerGRU
+import encoder
+from pokerGRU import PokerGRU
 
 app = Flask(__name__)
 
@@ -10,54 +9,32 @@ app = Flask(__name__)
 @app.route("/receive-game-state", methods=["POST"])
 def receive_game_state():
     game_state = request.json
+    
+    # Validate game_state contents
+    if not game_state or "hand" not in game_state or "board" not in game_state or "log" not in game_state:
+        return jsonify({"error": "Invalid game state"}), 400
+
+    if game_state["hand"] is None or game_state["board"] is None or game_state["log"] is None:
+        return jsonify({"error": "Missing game state information"}), 400
+    
     decision = make_decision(game_state)
-    # send_decision(decision)
+    print(decision)
     return jsonify(decision)
 
 
-# make a decision based on the current game state # to be done
+# make a decision based on the current game state
 def make_decision(game_state):
-    input_tensor = Encoder.input_to_tensor(*parser(game_state["board"], game_state["hand"], game_state["log"]))
-
-    action, action_probs = PokerGRU(256, 3)(input_tensor)
-
-    actions = [
-        "FOLD",
-        "CHECK",
-        "CALL",
-        "BET SMALL",
-        "BET MEDIUM",
-        "BET BIG",
-        "BET ALL IN",
-        "RAISE SMALL",
-        "RAISE MEDIUM",
-        "RAISE BIG",
-        "RAISE ALL IN",
-        "ALL IN",
-    ]
-    print(action_probs)
-    return actions[action]
+    
+    # converts the game state to a input tensor
+    input_tensor = encoder.input_to_tensor(game_state["hand"], game_state["board"], game_state["log"])
 
 
-# send the decision back to the java side for them to handle
-def send_decision(decision):
-    url = "http://localhost:8080/python-post"
-    requests.post(url, json=decision)
+    # retrives the action from the nueral network based on the input tensor
+    action, _ = PokerGRU(256, 3)(input_tensor)
 
+    # return the action 
+    return encoder.decode_action(action)
 
-def parser(board, hand, log):
-    # Extract board cards
-    board_cards = [
-        card["value"] + card["suit"] for card in board["boardCards"][: board["size"]]
-    ]
-
-    # Extract hand cards
-    hand_cards = [card["value"] + card["suit"] for card in hand["hand"]]
-
-    # Extract log actions
-    log_actions = [log_entry["action"] for log_entry in log["logs"][: log["size"]]]
-
-    return board_cards, hand_cards, log_actions
 
 
 if __name__ == "__main__":
