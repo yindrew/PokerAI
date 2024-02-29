@@ -19,7 +19,7 @@ class PokerGRU(nn.Module):
         self.output = nn.Linear(hidden_size, 11)  # 12 outputs  [fold, call, check, bet small, bet medium, bet big, bet all in, raise small, raise medium, raise big, raise all in, all in]
 
 
-    def forward(self, input_tensor):
+    def forward(self, input_tensor, legalMoves):
         
         # update the input tensor to use embeddings for card values instead of index
         card_indices = input_tensor[:7].long()
@@ -37,10 +37,20 @@ class PokerGRU(nn.Module):
         # Since we're interested in the output of the last time step
         # and if out has three dimensions (batch, seq_len, features),
         # we can use out[:, -1, :] to access the last time step
+        
+        
+        # retrive the frequencies of the actions and mask the actions that are unallowed
         decision_out = self.output(out[:, -1, :])
-        decision_probs = F.softmax(decision_out, dim=1)
+        decision_probs = F.softmax(decision_out, dim=1) * torch.tensor(legalMoves) 
+        decision_probs = decision_probs / decision_probs.sum(dim=1, keepdim=True)
+
+        # select one of the actions randomly at frequency
         action = torch.multinomial(decision_probs, 1).item()
 
         return action, decision_probs
 
+    
+    def process_final_state(self, final_state, optimizer):
+        self.forward
+        return 0
 

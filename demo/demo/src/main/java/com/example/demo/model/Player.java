@@ -11,17 +11,22 @@ public class Player {
     private String name;
     private DecisionController decisionController;
     private GameState gameState;
+    private int[] legalActions;
 
     public Player() {
-        gameState = new GameState(null, null, null);
+        gameState = new GameState(null, null, null, null);
 
+    }
+
+    public void setLegalActions(int[] asd) {
+        this.legalActions = asd;
     }
 
     public Player(String name) {
         this.name = name;
         this.stack = 100;
         decisionController = new DecisionController();
-        gameState = new GameState(null, null, null);
+        gameState = new GameState(null, null, null, null);
         hand = new Hand("AdAh");
 
     }
@@ -32,11 +37,7 @@ public class Player {
         return new Log(newAction, size);
     }
 
-    public Log getAction(GameLog log, Board board) {
-
-        // update the board
-        gameState.setBoard(board);
-        gameState.setLog(log);
+    public Log getAction() {
 
         String action = decisionController.sendGameState(gameState);
         action = action.replace(" ", "_").replace("\"", "").trim();
@@ -80,6 +81,15 @@ public class Player {
 
     public String toString() {
         return getName();
+    }
+
+    public void setGameState(GameState gs) {
+        gameState = gs;
+    }
+
+
+    public void setLegalMoves(int[] legalMoves) {
+        this.gameState.setLegalMoves(legalMoves);
     }
 
 

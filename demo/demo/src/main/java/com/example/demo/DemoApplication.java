@@ -5,14 +5,16 @@ import java.util.Scanner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.example.demo.controller.DecisionController;
 import com.example.demo.model.Action;
 import com.example.demo.model.Board;
 import com.example.demo.model.Card;
 import com.example.demo.model.GameLog;
 import com.example.demo.model.GameState;
 import com.example.demo.model.Log;
+import com.example.demo.service.GameManager;
 import com.example.demo.model.Hand;
-import com.example.demo.controller.DecisionController;
+
 
 @SpringBootApplication
 public class DemoApplication {
@@ -46,8 +48,9 @@ public class DemoApplication {
         Card handCard2 = new Card("As");
         Board board = new Board(new Card[]{deckCard1, deckCard2, deckCard3});
         Hand hand = new Hand(new Card[] {handCard1, handCard2});
+        int[] legalMoves = new int[]{0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0};
 
-        GameState gameState = new GameState(board, hand, log);
+        GameState gameState = new GameState(board, hand, log, legalMoves);
 
 
         DecisionController controller = new DecisionController();

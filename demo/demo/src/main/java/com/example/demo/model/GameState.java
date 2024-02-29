@@ -4,11 +4,13 @@ public class GameState {
     private Board board;
     private Hand hand;
     private GameLog log;
+    private int[] legalMoves;
 
-    public GameState(Board b, Hand h, GameLog l) {
+    public GameState(Board b, Hand h, GameLog l, int[] legal) {
         board = b;
         hand = h;
         log = l;
+        legalMoves = legal;
     }
 
 
@@ -24,6 +26,10 @@ public class GameState {
         return log;
     }
 
+    public int[] getLegalMoves() {
+        return legalMoves;
+    }
+
 
     public void setBoard(Board b) {
         board = b;
@@ -35,6 +41,10 @@ public class GameState {
 
     public void setLog(GameLog l) {
         log = l;
+    }
+
+    public void setLegalMoves(int[] moves) {
+        legalMoves = moves;
     }
 
     public String toString() {

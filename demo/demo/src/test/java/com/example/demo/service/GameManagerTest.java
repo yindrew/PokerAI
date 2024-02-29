@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.example.demo.model.Player;
@@ -12,6 +12,10 @@ import com.example.demo.model.Player;
 public class GameManagerTest {
     GameManager gameManager;
 
+    @BeforeEach
+    void beforeEach() {
+        gameManager = new GameManager();
+    }
 
     @Test
     void testDealHoleCards() {
@@ -39,10 +43,13 @@ public class GameManagerTest {
     void testHandlePreflop() throws Exception {
         gameManager = new GameManager();
         gameManager.setUpGame();
-        gameManager.advanceGame();
-        
+        gameManager.advanceGame();  
     }
 
+    @Test
+    void testLegalActions() {
+        gameManager = new GameManager();
+    }
 
     
 }
