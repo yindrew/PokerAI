@@ -32,8 +32,8 @@ class FinalGameState:
         self.hand = Hand(**hand)
         self.gameLog = GameLog(**gameLog)
         self.amountWon = amountWon
-    
-    def convertInputTensor():
+        
+    def convertToTensor():
         return 0
 
     @classmethod
