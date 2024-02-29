@@ -1,5 +1,6 @@
 import json
-
+import encoder
+import torch  
 class Card:
     def __init__(self, suit, value, cardVal):
         self.suit = suit
@@ -33,8 +34,16 @@ class FinalGameState:
         self.gameLog = GameLog(**gameLog)
         self.amountWon = amountWon
         
-    def convertToTensor():
-        return 0
+    def convertToTensor(self):
+        allCards = [card.value + card.suit for card in self.hand.hand] + [card.value + card.suit for card in self.board.boardCards] 
+        allCards = torch.tensor([encoder.encode_card(card) for card in allCards] + [-1] * (7 - len(allCards)))
+        
+        log_embeddings = torch.cat([encoder.encode_action(act.action) for act in self.gameLog.logs] + [torch.zeros(11) for _ in range(15 - self.gameLog.size)]).flatten()
+        
+        outputTensor = torch.cat((allCards, log_embeddings), dim=0)
+        
+        print(outputTensor)
+        return outputTensor
 
     @classmethod
     def from_json(cls, json_data):

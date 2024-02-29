@@ -32,7 +32,7 @@ class PokerGRU(nn.Module):
             input_tensor = input_tensor.unsqueeze(0)
 
         # Forward propagate the GRU
-        out, _ = self.gru(input_tensor)
+        out, hidden = self.gru(input_tensor)
 
         # Since we're interested in the output of the last time step
         # and if out has three dimensions (batch, seq_len, features),
@@ -47,10 +47,12 @@ class PokerGRU(nn.Module):
         # select one of the actions randomly at frequency
         action = torch.multinomial(decision_probs, 1).item()
 
-        return action, decision_probs
+        return action, decision_probs, hidden
 
     
     def process_final_state(self, final_state, optimizer):
-        self.forward
+        _, _, loss = self.forward(final_state, [1] * 11)
+        
+        
         return 0
 

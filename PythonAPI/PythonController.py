@@ -32,7 +32,7 @@ def make_decision(game_state):
     input_tensor = encoder.input_to_tensor(game_state["hand"], game_state["board"], game_state["log"])
     legal_moves = game_state["legalMoves"]
     # retrives the action from the nueral network based on the input tensor
-    action, decisions = PokerGRU(256, 3)(input_tensor, legal_moves)
+    action, decisions, _ = PokerGRU(256, 3)(input_tensor, legal_moves)
     
     # return the action 
     return encoder.decode_action(action)
