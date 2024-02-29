@@ -20,20 +20,20 @@ class GameLog:
     def __init__(self, potSize, size, logs):
         self.potSize = potSize
         self.size = size
-        self.logs = [GameLogEntry(**log) for log in logs]
+        self.logs = [GameLogEntry(**i) for i in logs]
 
 class Board:
     def __init__(self, boardCards, size):
         self.boardCards = [Card(**card) for card in boardCards]
         self.size = size
 
-class FinalGameState:
-    def __init__(self, board, hand, gameLog, amountWon):
+
+class State: 
+    def __init__(self, board, hand, gameLog):
         self.board = Board(**board)
         self.hand = Hand(**hand)
-        self.gameLog = GameLog(**gameLog)
-        self.amountWon = amountWon
-        
+        self.gameLog = GameLog(**gameLog)        
+    
     def convertToTensor(self):
         allCards = [card.value + card.suit for card in self.hand.hand] + [card.value + card.suit for card in self.board.boardCards] 
         allCards = torch.tensor([encoder.encode_card(card) for card in allCards] + [-1] * (7 - len(allCards)))
@@ -42,9 +42,21 @@ class FinalGameState:
         
         outputTensor = torch.cat((allCards, log_embeddings), dim=0)
         
-        print(outputTensor)
         return outputTensor
-
+    
     @classmethod
     def from_json(cls, json_data):
         return cls(**json_data)
+
+
+class GameState(State):
+    def __init__(self, board, hand, gameLog, legalMoves):
+        super().__init__(board, hand, gameLog)
+        self.legalMoves = legalMoves
+        
+        
+class FinalState(State):
+    def __init__(self, board, hand, gameLog, amountWon):
+        super().__init__(board, hand, gameLog)
+        self.amountWon = amountWon
+        

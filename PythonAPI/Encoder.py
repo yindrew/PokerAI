@@ -19,24 +19,7 @@ def encode_card(card):
     suit_index = suits.index(suit)
     rank_index = ranks.index(rank)
 
-    
     return suit_index * len(ranks) + rank_index
-
-
-# parsing the game state json into arrays
-def parser(hand, board, log):
-    # Extract board cards
-    board_cards = [
-        card["value"] + card["suit"] for card in board["boardCards"][: board["size"]]
-    ]
-
-    # Extract hand cards
-    hand_cards = [card["value"] + card["suit"] for card in hand["hand"]]
-
-    # Extract log actions
-    log_actions = [log_entry["action"] for log_entry in log["logs"][: log["size"]]]
-
-    return board_cards, hand_cards, log_actions
 
 
 # getting a action from a value
@@ -48,23 +31,8 @@ def decode_action(action):
  
 # One-hot encoding for decision and action
 def encode_action(action):
-    actions = ["FOLD", "CHECK", "CALL", "BET SMALL", "BET MEDIUM", "BET BIG", "BET ALL IN", "RAISE SMALL", "RAISE MEDIUM", "RAISE BIG", "RAISE ALL IN"]
+    actions = ["FOLD", "CHECK", "CALL", "BET_SMALL", "BET_MEDIUM", "BET_BIG", "BET_ALL_IN", "RAISE_SMALL", "RAISE_MEDIUM", "RAISE_BIG", "RAISE_ALL_IN"]
     return torch.tensor([1 if a == action else 0 for a in actions])
 
 
 
-# converts the hand, board and gamelog  
-def input_to_tensor(hand, board, game_log):
-    
-    
-    hand, board, game_log = parser(hand, board, game_log)
-
-    # Encode hand and board, pads the board with -1 if not filled
-    all_card_indices = torch.tensor([encode_card(card) for card in hand] + [encode_card(card) for card in board] + [-1] * (4 - len(board)))
-
-
-    # Encode game log
-    log_embeddings = torch.cat([encode_action(action) for action in game_log] + [torch.zeros(11) for _ in range(15 - len(game_log))]).flatten()
-
-    # Concatenate all embeddings
-    return torch.cat([all_card_indices, log_embeddings]).flatten()

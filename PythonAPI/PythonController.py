@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import encoder
 from pokerGRU import PokerGRU
-from finalState import FinalGameState
+from StateManager import FinalGameState
 
 app = Flask(__name__)
 
@@ -10,6 +10,7 @@ app = Flask(__name__)
 @app.route("/receive-game-state", methods=["POST"])
 def receive_game_state():
     game_state = request.json
+    print(game_state)
     decision = make_decision(game_state)
     print(decision)
     return jsonify(decision)
@@ -29,7 +30,7 @@ def receive_final_state():
 def make_decision(game_state):
     
     # converts the game state to a input tensor
-    input_tensor = encoder.input_to_tensor(game_state["hand"], game_state["board"], game_state["log"])
+    input_tensor = encoder.input_to_tensor(game_state["hand"], game_state["board"], game_state["gameLog"])
     legal_moves = game_state["legalMoves"]
     # retrives the action from the nueral network based on the input tensor
     action, decisions, _ = PokerGRU(256, 3)(input_tensor, legal_moves)

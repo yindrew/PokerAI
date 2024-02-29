@@ -31,13 +31,13 @@ public class DemoApplication {
         Log l4 = new Log(Action.BET_SMALL, 15);
         Log l5 = new Log(Action.BET_ALL_IN, 90);
 
-        GameLog log = new GameLog();
-        log.addLog(l1);
-        log.addLog(l6);
-        log.addLog(l2);
-        log.addLog(l3);
-        log.addLog(l4);
-        log.addLog(l5);
+        GameLog gameLog = new GameLog();
+        gameLog.addLog(l1);
+        gameLog.addLog(l6);
+        gameLog.addLog(l2);
+        gameLog.addLog(l3);
+        gameLog.addLog(l4);
+        gameLog.addLog(l5);
 
 
         // initializing the board and hand
@@ -50,7 +50,7 @@ public class DemoApplication {
         Hand hand = new Hand(new Card[] {handCard1, handCard2});
         int[] legalMoves = new int[]{0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0};
 
-        GameState gameState = new GameState(board, hand, log, legalMoves);
+        GameState gameState = new GameState(board, hand, gameLog, legalMoves);
 
 
         DecisionController controller = new DecisionController();

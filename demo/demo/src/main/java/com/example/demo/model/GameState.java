@@ -3,13 +3,13 @@ package com.example.demo.model;
 public class GameState {
     private Board board;
     private Hand hand;
-    private GameLog log;
+    private GameLog gameLog;
     private int[] legalMoves;
 
     public GameState(Board b, Hand h, GameLog l, int[] legal) {
         board = b;
         hand = h;
-        log = l;
+        gameLog = l;
         legalMoves = legal;
     }
 
@@ -22,8 +22,8 @@ public class GameState {
         return hand;
     }
 
-    public GameLog getLog() {
-        return log;
+    public GameLog getGameLog() {
+        return gameLog;
     }
 
     public int[] getLegalMoves() {
@@ -40,7 +40,7 @@ public class GameState {
     }
 
     public void setLog(GameLog l) {
-        log = l;
+        gameLog = l;
     }
 
     public void setLegalMoves(int[] moves) {
@@ -48,7 +48,7 @@ public class GameState {
     }
 
     public String toString() {
-        return "The board is " + board.toString() + " The hand is " + hand.toString() + " the log is " + log.toString();
+        return "The board is " + board.toString() + " The hand is " + hand.toString() + " the log is " + gameLog.toString();
     }
     
     
