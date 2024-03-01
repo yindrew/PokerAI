@@ -7,10 +7,11 @@ import com.example.demo.model.Deck;
 import com.example.demo.model.GameLog;
 import com.example.demo.model.Player;
 import com.example.demo.model.Action;
+import com.example.demo.model.GameState;
 
 import java.util.Scanner;
 
-enum GameState {
+enum Street {
     PREFLOP,
     FLOP,
     TURN,
@@ -28,14 +29,14 @@ public class GameManager {
     private Deck deck;
     private int currentPlayerIndex;
     private Board board;
-    private GameState currentState;
+    private Street currentState;
     private int flopx;
     private int turnx;
     private int riverx;
     private HandRanking handRanking1;
     private HandRanking handRanking2;
 
-    public void setGameState(GameState gs) {
+    public void setGameState(Street gs) {
         currentState = gs;
     }
 
@@ -52,7 +53,7 @@ public class GameManager {
         board = new Board(null);
         players = new Player[] { player1, player2 };
         currentPlayerIndex = 0;
-        currentState = GameState.PREFLOP;
+        currentState = Street.PREFLOP;
 
     }
 
@@ -78,7 +79,7 @@ public class GameManager {
         if (action == Action.RAISE_ALL_IN) {
             return players[currentPlayerIndex].getStack();
         }
-        if (currentState == GameState.PREFLOP) {
+        if (currentState == Street.PREFLOP) {
             if (action == Action.FOLD) {
                 return 0;
             }
@@ -159,7 +160,7 @@ public class GameManager {
             return new int[]{1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0};
         }
         lastMove = gameLog.getLogs().get(gameLog.getSize() - 1);
-        if (currentState == GameState.PREFLOP) {
+        if (currentState == Street.PREFLOP) {
             if (lastMove.getAction() == Action.RAISE_ALL_IN) {
                 return new int[]{1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0};
             }
@@ -254,26 +255,36 @@ public class GameManager {
     }
 
 
+    // public String getAction() {
+    //     int[] legalMoves = legalActions();
+    //     // Scanner prompts player for a legal action. 
+    //     Scanner scanner = new Scanner(System.in);
+    //     System.out.println(players[currentPlayerIndex].getName() + ", enter your action (" + getLegalActionsString(legalMoves) + ")");
+    //     int inputAction = scanner.nextInt();
+    //     int counter = 0;
+    //     String action = "";
+    //     for (int i= 0; i < legalMoves.length; i++){
+    //         if (legalMoves[i] == 1) {
+    //             counter += 1;
+    //             if (counter == inputAction) {
+    //                 action = Action.values()[i].toString();
+    //             }
+    //         }
+    //     }
+
+    //     return action;
+
+    // }
+
+
     public String getAction() {
-        int[] legalMoves = legalActions();
-        // Scanner prompts player for a legal action. 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println(players[currentPlayerIndex].getName() + ", enter your action (" + getLegalActionsString(legalMoves) + ")");
-        int inputAction = scanner.nextInt();
-        int counter = 0;
-        String action = "";
-        for (int i= 0; i < legalMoves.length; i++){
-            if (legalMoves[i] == 1) {
-                counter += 1;
-                if (counter == inputAction) {
-                    action = Action.values()[i].toString();
-                }
-            }
-        }
-
-        return action;
-
+        Player currentPlayer = players[currentPlayerIndex];
+        GameState gameState = new GameState(board, currentPlayer.getHand(), gameLog, legalActions());
+        currentPlayer.setGameState(gameState);
+        Log action = currentPlayer.getAction();
+        return action.getAction().toString();
     }
+
 
     public void setUpGame() {
         setUpPot();
@@ -281,11 +292,12 @@ public class GameManager {
         dealHoleCards();
         board.clearBoard();
         gameLog.clearLog();
-        currentState = GameState.PREFLOP;
+        currentState = Street.PREFLOP;
         flopx = 0;
         turnx = 0;
         riverx = 0;
-
+        player1.setStack(100);
+        player2.setStack(100);
     }
 
 
@@ -335,14 +347,23 @@ public class GameManager {
                 } else {
                     changeStack(potSize, player2);
                 }
-                currentState = GameState.GAMEOVER;
+                currentState = Street.GAMEOVER;
                 advanceGame();
                 break;
             case GAMEOVER:
                 statusUpdate();
-                Output output0 = finalReturn(0);
-                Output output1 = finalReturn(1);
+                Scanner scanner = new Scanner(System.in);
+                System.out.println("New Hand?");
+                int inputAction = scanner.nextInt();
+                if (inputAction == 1) {
+                    Output output0 = finalReturn(0);
+                    Output output1 = finalReturn(1);
+                    player1.sendFinalState(output0);
+                    setUpGame();
+                    advanceGame();
+                }
 
+                
                 break;
         }
     }
@@ -378,14 +399,14 @@ public class GameManager {
         switch (currentAction.getAction()) {
             case FOLD:
                 handleFold(currentAction);
-                currentState = GameState.GAMEOVER;
+                currentState = Street.GAMEOVER;
                 break;
             case CALL:
                 handleCall(currentAction);
-                currentState = GameState.FLOP;
+                currentState = Street.FLOP;
 
                 if (playersAllIn()) {
-                    currentState = GameState.SHOWDOWN;
+                    currentState = Street.SHOWDOWN;
                 }
                 break;
             case RAISE_ALL_IN:
@@ -415,13 +436,13 @@ public class GameManager {
         switch (currentAction.getAction()) {
             case FOLD:
                 handleFold(currentAction);
-                currentState = GameState.GAMEOVER;
+                currentState = Street.GAMEOVER;
                 break;
             case CALL:
                 handleCall(currentAction);
-                currentState = GameState.TURN;
+                currentState = Street.TURN;
                 if (playersAllIn()) {
-                    currentState = GameState.SHOWDOWN;
+                    currentState = Street.SHOWDOWN;
                 }
                 break;
             case RAISE_ALL_IN:
@@ -433,15 +454,15 @@ public class GameManager {
             case BET_MEDIUM:
             case BET_SMALL:                
             handleRaise(currentAction);
-                currentState = GameState.FLOP;
+                currentState = Street.FLOP;
                 break;
             case CHECK:
                 handleCheck(currentAction);
                 flopx += 1;
                 if (flopx == 2) {
-                    currentState = GameState.TURN;
+                    currentState = Street.TURN;
                 } else {
-                    currentState = GameState.FLOP;
+                    currentState = Street.FLOP;
                 }
                 break;
             default:
@@ -466,13 +487,13 @@ public class GameManager {
         switch (currentAction.getAction()) {
             case FOLD:
                 handleFold(currentAction);
-                currentState = GameState.GAMEOVER;
+                currentState = Street.GAMEOVER;
                 break;
             case CALL:
                 handleCall(currentAction);
-                currentState = GameState.RIVER;
+                currentState = Street.RIVER;
                 if (playersAllIn()) {
-                    currentState = GameState.SHOWDOWN;
+                    currentState = Street.SHOWDOWN;
                 }
                 break;
             case RAISE_ALL_IN:
@@ -488,7 +509,7 @@ public class GameManager {
             case CHECK:
                 handleCheck(currentAction);
                 turnx += 1;
-                currentState = (turnx == 2) ? GameState.RIVER : GameState.TURN;
+                currentState = (turnx == 2) ? Street.RIVER : Street.TURN;
                 break;
             default:
                 break;
@@ -510,11 +531,11 @@ public class GameManager {
         switch (currentAction.getAction()) {
             case FOLD:
                 handleFold(currentAction);
-                currentState = GameState.GAMEOVER;
+                currentState = Street.GAMEOVER;
                 break;
             case CALL:
                 handleCall(currentAction);
-                currentState = GameState.SHOWDOWN;
+                currentState = Street.SHOWDOWN;
                 break;
             case RAISE_ALL_IN:
             case RAISE_BIG:
@@ -529,7 +550,7 @@ public class GameManager {
             case CHECK:
                 handleCheck(currentAction);
                 riverx += 1;
-                currentState = (riverx == 2) ? GameState.SHOWDOWN : GameState.RIVER;
+                currentState = (riverx == 2) ? Street.SHOWDOWN : Street.RIVER;
                 break;
             default:
                 break;

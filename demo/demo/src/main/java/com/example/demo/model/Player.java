@@ -43,7 +43,11 @@ public class Player {
         action = action.replace(" ", "_").replace("\"", "").trim();
 
         return new Log(Action.valueOf(action), 0);
+    }
 
+    public String sendFinalState(Output gameState) {
+        String state = decisionController.sendFinalState(gameState);
+        return state;
     }
 
     public void setHand(Hand h) {

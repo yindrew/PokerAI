@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import encoder
 
 # 5 dimensional embedding representation for each card
 # spades -> clubs -> diamonds -> hearts
@@ -13,6 +13,7 @@ class PokerGRU(nn.Module):
         self.num_layers = num_layers
         self.card_embeddings = nn.Embedding(52, 5) # 52 cards, 5 dimension embedding
         self.gru = nn.GRU(200, hidden_size, num_layers, batch_first=True) # 35 from cards (7 cards * 5 dimension) + (11 action and embedding * 15 total actions allowed)
+        self.value_network = nn.Linear(hidden_size, 1)
 
 
         # Decision output layer
@@ -20,6 +21,7 @@ class PokerGRU(nn.Module):
 
 
     def forward(self, input_tensor, legalMoves):
+        
         
         # update the input tensor to use embeddings for card values instead of index
         card_indices = input_tensor[:7].long()
@@ -33,11 +35,6 @@ class PokerGRU(nn.Module):
 
         # Forward propagate the GRU
         out, hidden = self.gru(input_tensor)
-
-        # Since we're interested in the output of the last time step
-        # and if out has three dimensions (batch, seq_len, features),
-        # we can use out[:, -1, :] to access the last time step
-        
         
         # retrive the frequencies of the actions and mask the actions that are unallowed
         decision_out = self.output(out[:, -1, :])
@@ -46,13 +43,24 @@ class PokerGRU(nn.Module):
 
         # select one of the actions randomly at frequency
         action = torch.multinomial(decision_probs, 1).item()
+        
+        
+        # gets the value estimation
+        predicted_value = self.value_network(hidden[-1])
 
-        return action, decision_probs, hidden
+        return action, decision_probs, predicted_value
 
     
     def process_final_state(self, final_state, optimizer):
-        _, _, loss = self.forward(final_state, [1] * 11)
+        _, _, predicted_value = self.forward(final_state.convertToTensor(encoder), [1] * 11)
+        actual_value = final_state.amountWon
         
+        loss = F.mse_loss(predicted_value, torch.tensor(actual_value, dtype=predicted_value.dtype, device=predicted_value.device))
         
-        return 0
+        # Backpropogation
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()        
+        
+        return loss.item()
 

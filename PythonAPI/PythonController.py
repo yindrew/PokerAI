@@ -1,16 +1,27 @@
 from flask import Flask, request, jsonify
 import encoder
 from pokerGRU import PokerGRU
-from StateManager import FinalGameState
+from stateManager import FinalState, GameState
+import torch
 
 app = Flask(__name__)
+
+
+
+model_IP = PokerGRU(256, 3)
+model_OOP = PokerGRU(256, 3)
+optimizer_IP = torch.optim.Adam(model_IP.parameters(), lr=0.001)
+optimizer_OOP = torch.optim.Adam(model_IP.parameters(), lr=0.001)
+
 
 
 # when you recieve a game state, we will get the game state and convert it into a decision.
 @app.route("/receive-game-state", methods=["POST"])
 def receive_game_state():
+    model_IP.eval()
+    model_OOP.eval()
     game_state = request.json
-    print(game_state)
+    game_state = GameState.from_json(game_state)
     decision = make_decision(game_state)
     print(decision)
     return jsonify(decision)
@@ -20,23 +31,25 @@ def receive_game_state():
 @app.route("/receive-final-state", methods=["POST"])
 def receive_final_state():
     final_state = request.json
-    finalState = FinalGameState.from_json(final_state)
-    print(finalState.gameLog.potSize)    
-    print(finalState.board.size)
-    return jsonify(final_state)
+    final_state = FinalState.from_json(final_state)
+    model = PokerGRU(256, 3)
+    # model.process_final_state(final_state)
+    
+    return "working"
 
 
 # make a decision based on the current game state
 def make_decision(game_state):
     
-    # converts the game state to a input tensor
-    input_tensor = encoder.input_to_tensor(game_state["hand"], game_state["board"], game_state["gameLog"])
-    legal_moves = game_state["legalMoves"]
+    input_tensor = game_state.convertToTensor(encoder)
+    legalMoves = game_state.legalMoves
     # retrives the action from the nueral network based on the input tensor
-    action, decisions, _ = PokerGRU(256, 3)(input_tensor, legal_moves)
+    action, decisions, _ = PokerGRU(256, 3)(input_tensor, legalMoves)
     
-    # return the action 
+    # return the action
     return encoder.decode_action(action)
+
+
 
 
 
