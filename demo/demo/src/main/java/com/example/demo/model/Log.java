@@ -24,7 +24,7 @@ public class Log {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(double size) {
         this.size = size;
     }
 

@@ -2,9 +2,8 @@ package com.example.demo.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.model.Action;
 import com.example.demo.model.GameState;
-import com.example.demo.model.Output;
+import com.example.demo.model.FinalState;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,7 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RestController
 public class DecisionController {
 
-
+    /**
+     * Sends the Game State to the Python Service
+     * @param gameState The current Game State
+     * @return the Action taken by the python service
+     */
     public String sendGameState(GameState gameState) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -36,11 +39,15 @@ public class DecisionController {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        return "error";
+
+        return "error with sending game state";
     }
 
-
-    public String sendFinalState(Output gameState) {
+    /**
+     * sends the Final State to the Python Service
+     * @param gameState the final state of the game state
+     */
+    public void sendFinalState(FinalState gameState) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonPayload = objectMapper.writeValueAsString(gameState);
@@ -51,12 +58,10 @@ public class DecisionController {
 
             HttpEntity<String> request = new HttpEntity<>(jsonPayload, headers);
             String url = "http://127.0.0.1:4999/receive-final-state";  
-            String action = restTemplate.postForObject(url, request, String.class);
-            return action;
+            restTemplate.postForObject(url, request, String.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        return "error";
     }
 
 

@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.model.Log;
-import com.example.demo.model.Output;
+import com.example.demo.model.FinalState;
 import com.example.demo.model.Board;
 import com.example.demo.model.Deck;
 import com.example.demo.model.GameLog;
@@ -30,9 +30,7 @@ public class GameManager {
     private int currentPlayerIndex;
     private Board board;
     private Street currentState;
-    private int flopx;
-    private int turnx;
-    private int riverx;
+    private int check_counter;
     private HandRanking handRanking1;
     private HandRanking handRanking2;
 
@@ -255,49 +253,50 @@ public class GameManager {
     }
 
 
-    // public String getAction() {
-    //     int[] legalMoves = legalActions();
-    //     // Scanner prompts player for a legal action. 
-    //     Scanner scanner = new Scanner(System.in);
-    //     System.out.println(players[currentPlayerIndex].getName() + ", enter your action (" + getLegalActionsString(legalMoves) + ")");
-    //     int inputAction = scanner.nextInt();
-    //     int counter = 0;
-    //     String action = "";
-    //     for (int i= 0; i < legalMoves.length; i++){
-    //         if (legalMoves[i] == 1) {
-    //             counter += 1;
-    //             if (counter == inputAction) {
-    //                 action = Action.values()[i].toString();
-    //             }
-    //         }
-    //     }
+    public Log getAction() {
+        int[] legalMoves = legalActions();
+        // Scanner prompts player for a legal action. 
+        Scanner scanner = new Scanner(System.in);
+        System.out.println(players[currentPlayerIndex].getName() + ", enter your action (" + getLegalActionsString(legalMoves) + ")");
+        int inputAction = scanner.nextInt();
+        int counter = 0;
+        String action = "";
+        for (int i= 0; i < legalMoves.length; i++){
+            if (legalMoves[i] == 1) {
+                counter += 1;
+                if (counter == inputAction) {
+                    action = Action.values()[i].toString();
+                }
+            }
+        }
+        Action output = Action.valueOf(action);
+        double size = properSize(output);
+         
+        return new Log(output, size);
 
-    //     return action;
-
-    // }
-
-
-    public String getAction() {
-        Player currentPlayer = players[currentPlayerIndex];
-        GameState gameState = new GameState(board, currentPlayer.getHand(), gameLog, legalActions());
-        currentPlayer.setGameState(gameState);
-        Log action = currentPlayer.getAction();
-        return action.getAction().toString();
     }
 
 
+    // public Log getAction() {
+    //     Player currentPlayer = players[currentPlayerIndex];
+    //     GameState gameState = new GameState(board, currentPlayer.getHand(), gameLog, legalActions());
+    //     Log action = currentPlayer.getAction(gameState);
+    //     action.setSize(properSize(action.getAction()));
+    //     return action;
+    // }
+
+
     public void setUpGame() {
+        player1.setStack(100);
+        player2.setStack(100);
         setUpPot();
         deck.newDeck();
         dealHoleCards();
         board.clearBoard();
         gameLog.clearLog();
         currentState = Street.PREFLOP;
-        flopx = 0;
-        turnx = 0;
-        riverx = 0;
-        player1.setStack(100);
-        player2.setStack(100);
+        check_counter = 0;
+
     }
 
 
@@ -313,6 +312,7 @@ public class GameManager {
                 if (board.getBoardCards().size() != 3) {
                     deal();deal();deal();
                     currentPlayerIndex = 0;
+                    check_counter = 0;
                 }
                 statusUpdate();
                 handleFlop();
@@ -321,6 +321,8 @@ public class GameManager {
                 if (board.getBoardCards().size() != 4) {
                     deal();
                     currentPlayerIndex = 0;
+                    check_counter = 0;
+
                 }
                 statusUpdate();
                 handleTurn();
@@ -329,14 +331,17 @@ public class GameManager {
                 if (board.getBoardCards().size() != 5) {
                     deal();
                     currentPlayerIndex = 0;
+                    check_counter = 0;
                 }
                 statusUpdate();
                 handleRiver();
                 break;
             case SHOWDOWN:
-                while (board.getBoardCards().size() != 5) {
+                // if players are all in deal out the board and determine winner
+                while (board.getBoardCards().size() != 5 && playersAllIn()) {
                     deal();
                 }
+
                 // determine the winning player and distribute the pot
                 Player temp = determineWinner();
                 if (temp == null) {
@@ -352,24 +357,28 @@ public class GameManager {
                 break;
             case GAMEOVER:
                 statusUpdate();
-                Scanner scanner = new Scanner(System.in);
-                System.out.println("New Hand?");
-                int inputAction = scanner.nextInt();
-                if (inputAction == 1) {
-                    Output output0 = finalReturn(0);
-                    Output output1 = finalReturn(1);
-                    player1.sendFinalState(output0);
-                    setUpGame();
-                    advanceGame();
-                }
+                FinalState output0 = finalReturn(0);
+                FinalState output1 = finalReturn(1);
+                player1.sendFinalState(output0);
 
+                startNewGame();
                 
                 break;
         }
     }
 
-    public Output finalReturn(int playerIndex) {
-        return new Output(board, players[playerIndex].getHand(), players[playerIndex].getStack() - 100, gameLog);
+    public void startNewGame() throws Exception {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("New Hand?");
+        int inputAction = scanner.nextInt();
+        if (inputAction == 1) {
+            setUpGame();
+            advanceGame();
+        }
+    }
+
+    public FinalState finalReturn(int playerIndex) {
+        return new FinalState(board, players[playerIndex].getHand(),gameLog, players[playerIndex].getStack() - 100);
     }
 
 
@@ -390,11 +399,9 @@ public class GameManager {
 
     private void handlePreFlop() throws Exception {
 
-        String inputAction = getAction();
-        double inputSize = properSize(Action.valueOf(inputAction));
-        Log currentAction = players[currentPlayerIndex].getAction(inputAction, inputSize);
+        Log currentAction = getAction();
 
-
+ 
         // based on the action handle the action.
         switch (currentAction.getAction()) {
             case FOLD:
@@ -402,7 +409,7 @@ public class GameManager {
                 currentState = Street.GAMEOVER;
                 break;
             case CALL:
-                handleCall(currentAction);
+                handleAction(currentAction);
                 currentState = Street.FLOP;
 
                 if (playersAllIn()) {
@@ -417,7 +424,7 @@ public class GameManager {
             case BET_BIG:
             case BET_MEDIUM:
             case BET_SMALL:
-                handleRaise(currentAction);
+                handleAction(currentAction);
                 break;
             case CHECK:
             default:
@@ -428,9 +435,7 @@ public class GameManager {
 
     private void handleFlop() throws Exception {
 
-        String inputAction = getAction();
-        double inputSize = properSize(Action.valueOf(inputAction));
-        Log currentAction = players[currentPlayerIndex].getAction(inputAction, inputSize);
+        Log currentAction = getAction();
 
         // based on the action handle the action.
         switch (currentAction.getAction()) {
@@ -439,7 +444,7 @@ public class GameManager {
                 currentState = Street.GAMEOVER;
                 break;
             case CALL:
-                handleCall(currentAction);
+                handleAction(currentAction);
                 currentState = Street.TURN;
                 if (playersAllIn()) {
                     currentState = Street.SHOWDOWN;
@@ -453,17 +458,13 @@ public class GameManager {
             case BET_BIG:
             case BET_MEDIUM:
             case BET_SMALL:                
-            handleRaise(currentAction);
+            handleAction(currentAction);
                 currentState = Street.FLOP;
                 break;
             case CHECK:
-                handleCheck(currentAction);
-                flopx += 1;
-                if (flopx == 2) {
-                    currentState = Street.TURN;
-                } else {
-                    currentState = Street.FLOP;
-                }
+                handleAction(currentAction);
+                check_counter += 1;
+                currentState = (check_counter == 2) ? Street.TURN : Street.FLOP;
                 break;
             default:
                 break;
@@ -474,12 +475,7 @@ public class GameManager {
 
     // Similar methods for Turn and River
     private void handleTurn() throws Exception {
-
-        String inputAction = getAction();
-
-        double inputSize = properSize(Action.valueOf(inputAction));
-        
-        Log currentAction = players[currentPlayerIndex].getAction(inputAction, inputSize);
+        Log currentAction =getAction();
 
         // Log currentAction = players[currentPlayerIndex].getAction(gameLog);
 
@@ -490,7 +486,7 @@ public class GameManager {
                 currentState = Street.GAMEOVER;
                 break;
             case CALL:
-                handleCall(currentAction);
+                handleAction(currentAction);
                 currentState = Street.RIVER;
                 if (playersAllIn()) {
                     currentState = Street.SHOWDOWN;
@@ -504,12 +500,12 @@ public class GameManager {
             case BET_BIG:
             case BET_MEDIUM:
             case BET_SMALL: 
-                handleRaise(currentAction);
+                handleAction(currentAction);
                 break;
             case CHECK:
-                handleCheck(currentAction);
-                turnx += 1;
-                currentState = (turnx == 2) ? Street.RIVER : Street.TURN;
+                handleAction(currentAction);
+                check_counter += 1;
+                currentState = (check_counter == 2) ? Street.RIVER : Street.TURN;
                 break;
             default:
                 break;
@@ -521,11 +517,7 @@ public class GameManager {
 
     private void handleRiver() throws Exception {
 
-        String inputAction = getAction();
-        double inputSize = properSize(Action.valueOf(inputAction));
-        Log currentAction = players[currentPlayerIndex].getAction(inputAction, inputSize);
-
-        // Log currentAction = players[currentPlayerIndex].getAction(gameLog);
+        Log currentAction = getAction();
 
         // based on the action handle the action.
         switch (currentAction.getAction()) {
@@ -534,7 +526,7 @@ public class GameManager {
                 currentState = Street.GAMEOVER;
                 break;
             case CALL:
-                handleCall(currentAction);
+                handleAction(currentAction);
                 currentState = Street.SHOWDOWN;
                 break;
             case RAISE_ALL_IN:
@@ -545,12 +537,12 @@ public class GameManager {
             case BET_BIG:
             case BET_MEDIUM:
             case BET_SMALL: 
-                handleRaise(currentAction);
+                handleAction(currentAction);
                 break;
             case CHECK:
-                handleCheck(currentAction);
-                riverx += 1;
-                currentState = (riverx == 2) ? Street.SHOWDOWN : Street.RIVER;
+                handleAction(currentAction);
+                check_counter += 1;
+                currentState = (check_counter == 2) ? Street.SHOWDOWN : Street.RIVER;
                 break;
             default:
                 break;
@@ -559,19 +551,8 @@ public class GameManager {
     }
 
 
-    private void handleRaise(Log action) throws Exception {
-        gameLog.addLog(action);
-        changeStack(-action.getSize(), players[currentPlayerIndex]);
-        nextTurn();
-    }
 
-    private void handleCheck(Log action) {
-        gameLog.addLog(action);
-        nextTurn();
-
-    }
-
-    private void handleCall(Log action) {
+    private void handleAction(Log action) {
         gameLog.addLog(action);
         changeStack(-action.getSize(), players[currentPlayerIndex]);
         nextTurn();
@@ -596,6 +577,7 @@ public class GameManager {
             return null;
         }
     }
+
 
     public Board getBoard() {
         return board;

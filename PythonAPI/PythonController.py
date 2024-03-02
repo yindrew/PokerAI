@@ -14,7 +14,6 @@ optimizer_IP = torch.optim.Adam(model_IP.parameters(), lr=0.001)
 optimizer_OOP = torch.optim.Adam(model_IP.parameters(), lr=0.001)
 
 
-
 # when you recieve a game state, we will get the game state and convert it into a decision.
 @app.route("/receive-game-state", methods=["POST"])
 def receive_game_state():

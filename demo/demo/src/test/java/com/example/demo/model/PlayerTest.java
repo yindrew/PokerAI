@@ -45,9 +45,7 @@ class PlayerTest {
         GameState gameState = new GameState(board, hand, log, legalMoves);
 
 
-        player.setGameState(gameState);
-
-        Log action = player.getAction();
+        Log action = player.getAction(gameState);
         System.out.println(action);
     }
 
@@ -77,10 +75,9 @@ class PlayerTest {
         Card handCard2 = new Card("As");
         Board board = new Board(new Card[]{deckCard1, deckCard2, deckCard3});
         Hand hand = new Hand(new Card[] {handCard1, handCard2});
-        Output output = new Output(board, hand, 50, log);
+        FinalState output = new FinalState(board, hand, log, 50);
         DecisionController dc = new DecisionController();
-        String test = dc.sendFinalState(output);
-        System.out.println(test);
+        dc.sendFinalState(output);
 
     }
 
