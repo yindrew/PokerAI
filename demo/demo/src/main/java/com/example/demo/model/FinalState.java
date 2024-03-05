@@ -6,8 +6,8 @@ package com.example.demo.model;
 public class FinalState extends State {
     private double playerwon;
 
-    public FinalState(Board b, Hand h, GameLog gl, double a1) {
-        super(b, h, gl);
+    public FinalState(Board b, Hand h, GameLog gl, double a1, int pos) {
+        super(b, h, gl, pos);
         playerwon = a1;
     }
 

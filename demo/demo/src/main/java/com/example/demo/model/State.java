@@ -4,13 +4,22 @@ public class State {
     private Board board;
     private Hand hand;
     private GameLog gameLog;
+    private int position;
 
-    public State(Board b, Hand h, GameLog l) {
+    public State(Board b, Hand h, GameLog l, int pos) {
         board = b;
         hand = h;
         gameLog = l;
+        position = pos;
     }
 
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int pos) {
+        position = pos;
+    }
 
     public Board getBoard() {
         return board;

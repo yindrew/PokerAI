@@ -50,7 +50,7 @@ public class DemoApplication {
         Hand hand = new Hand(new Card[] {handCard1, handCard2});
         int[] legalMoves = new int[]{0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0};
 
-        GameState gameState = new GameState(board, hand, gameLog, legalMoves);
+        GameState gameState = new GameState(board, hand, gameLog, legalMoves, 0);
 
 
         DecisionController controller = new DecisionController();

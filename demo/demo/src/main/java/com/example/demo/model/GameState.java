@@ -6,8 +6,8 @@ public class GameState extends State {
 
     private int[] legalMoves;
 
-    public GameState(Board b, Hand h, GameLog l, int[] legal) {
-        super(b, h, l);
+    public GameState(Board b, Hand h, GameLog l, int[] legal, int pos) {
+        super(b, h, l, pos);
         legalMoves = legal;
     }
 

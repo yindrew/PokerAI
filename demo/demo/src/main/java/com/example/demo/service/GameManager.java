@@ -3,9 +3,11 @@ package com.example.demo.service;
 import com.example.demo.model.Log;
 import com.example.demo.model.FinalState;
 import com.example.demo.model.Board;
+import com.example.demo.model.Decision;
 import com.example.demo.model.Deck;
 import com.example.demo.model.GameLog;
 import com.example.demo.model.Player;
+import com.example.demo.controller.DecisionController;
 import com.example.demo.model.Action;
 import com.example.demo.model.GameState;
 
@@ -33,6 +35,13 @@ public class GameManager {
     private int check_counter;
     private HandRanking handRanking1;
     private HandRanking handRanking2;
+    private int totalTraining = 200;
+    private int timesTrained = 0;
+    private DecisionController decisionController;
+
+    public DecisionController getDecisionController() {
+        return decisionController;
+    }
 
     public void setGameState(Street gs) {
         currentState = gs;
@@ -52,6 +61,7 @@ public class GameManager {
         players = new Player[] { player1, player2 };
         currentPlayerIndex = 0;
         currentState = Street.PREFLOP;
+        decisionController = new DecisionController();
 
     }
 
@@ -253,37 +263,36 @@ public class GameManager {
     }
 
 
-    public Log getAction() {
-        int[] legalMoves = legalActions();
-        // Scanner prompts player for a legal action. 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println(players[currentPlayerIndex].getName() + ", enter your action (" + getLegalActionsString(legalMoves) + ")");
-        int inputAction = scanner.nextInt();
-        int counter = 0;
-        String action = "";
-        for (int i= 0; i < legalMoves.length; i++){
-            if (legalMoves[i] == 1) {
-                counter += 1;
-                if (counter == inputAction) {
-                    action = Action.values()[i].toString();
-                }
-            }
-        }
-        Action output = Action.valueOf(action);
-        double size = properSize(output);
-         
-        return new Log(output, size);
-
-    }
-
-
     // public Log getAction() {
-    //     Player currentPlayer = players[currentPlayerIndex];
-    //     GameState gameState = new GameState(board, currentPlayer.getHand(), gameLog, legalActions());
-    //     Log action = currentPlayer.getAction(gameState);
-    //     action.setSize(properSize(action.getAction()));
-    //     return action;
+    //     int[] legalMoves = legalActions();
+    //     // Scanner prompts player for a legal action. 
+    //     Scanner scanner = new Scanner(System.in);
+    //     System.out.println(players[currentPlayerIndex].getName() + ", enter your action (" + getLegalActionsString(legalMoves) + ")");
+    //     int inputAction = scanner.nextInt();
+    //     int counter = 0;
+    //     String action = "";
+    //     for (int i= 0; i < legalMoves.length; i++){
+    //         if (legalMoves[i] == 1) {
+    //             counter += 1;
+    //             if (counter == inputAction) {
+    //                 action = Action.values()[i].toString();
+    //             }
+    //         }
+    //     }
+    //     Action output = Action.valueOf(action);
+    //     double size = properSize(output);
+         
+    //     return new Log(output, size);
     // }
+
+
+    public Log getAction() {
+        Player currentPlayer = players[currentPlayerIndex];
+        GameState gameState = new GameState(board, currentPlayer.getHand(), gameLog, legalActions(), currentPlayerIndex);
+        Log action = currentPlayer.getAction(gameState);
+        action.setSize(properSize(action.getAction()));
+        return action;
+    }
 
 
     public void setUpGame() {
@@ -296,6 +305,7 @@ public class GameManager {
         gameLog.clearLog();
         currentState = Street.PREFLOP;
         check_counter = 0;
+        currentPlayerIndex = 0;
 
     }
 
@@ -311,7 +321,7 @@ public class GameManager {
             case FLOP:
                 if (board.getBoardCards().size() != 3) {
                     deal();deal();deal();
-                    currentPlayerIndex = 0;
+                    currentPlayerIndex = 1;
                     check_counter = 0;
                 }
                 statusUpdate();
@@ -320,7 +330,7 @@ public class GameManager {
             case TURN:
                 if (board.getBoardCards().size() != 4) {
                     deal();
-                    currentPlayerIndex = 0;
+                    currentPlayerIndex = 1;
                     check_counter = 0;
 
                 }
@@ -330,7 +340,7 @@ public class GameManager {
             case RIVER:
                 if (board.getBoardCards().size() != 5) {
                     deal();
-                    currentPlayerIndex = 0;
+                    currentPlayerIndex = 1;
                     check_counter = 0;
                 }
                 statusUpdate();
@@ -368,17 +378,15 @@ public class GameManager {
     }
 
     public void startNewGame() throws Exception {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("New Hand?");
-        int inputAction = scanner.nextInt();
-        if (inputAction == 1) {
+        while (timesTrained < totalTraining) {
+            timesTrained += 1;
             setUpGame();
             advanceGame();
         }
     }
 
     public FinalState finalReturn(int playerIndex) {
-        return new FinalState(board, players[playerIndex].getHand(),gameLog, players[playerIndex].getStack() - 100);
+        return new FinalState(board, players[playerIndex].getHand(),gameLog, players[playerIndex].getStack() - 100, playerIndex);
     }
 
 
@@ -390,6 +398,7 @@ public class GameManager {
         System.out.println(player2.getName() + " has " + player2.getHand().toString() + " " + player2.getStack());
         System.out.println("Pot size is " + potSize);
         System.out.println("The current GameLog " + gameLog.toString());
+        System.out.println("The current player position is " + currentPlayerIndex);
     }
 
     public boolean playersAllIn() {
@@ -596,6 +605,8 @@ public class GameManager {
         GameManager GM = new GameManager();
         GM.setUpGame();
         GM.advanceGame();
+
+        GM.getDecisionController().notifyTrainingComplete();
     }
 
 }

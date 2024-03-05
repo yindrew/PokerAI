@@ -42,7 +42,7 @@ class PlayerTest {
         Hand hand = new Hand(new Card[] {handCard1, handCard2});
         int[] legalMoves = new int[]{0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0};
 
-        GameState gameState = new GameState(board, hand, log, legalMoves);
+        GameState gameState = new GameState(board, hand, log, legalMoves, 0);
 
 
         Log action = player.getAction(gameState);
@@ -75,7 +75,7 @@ class PlayerTest {
         Card handCard2 = new Card("As");
         Board board = new Board(new Card[]{deckCard1, deckCard2, deckCard3});
         Hand hand = new Hand(new Card[] {handCard1, handCard2});
-        FinalState output = new FinalState(board, hand, log, 50);
+        FinalState output = new FinalState(board, hand, log, 50, 0);
         DecisionController dc = new DecisionController();
         dc.sendFinalState(output);
 

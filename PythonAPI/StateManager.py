@@ -29,10 +29,11 @@ class Board:
 
 
 class State: 
-    def __init__(self, board, hand, gameLog):
+    def __init__(self, board, hand, gameLog, position):
         self.board = Board(**board)
         self.hand = Hand(**hand)
-        self.gameLog = GameLog(**gameLog)        
+        self.gameLog = GameLog(**gameLog)   
+        self.position = position     
     
     def convertToTensor(self, encoder):
         allCards = [card.value + card.suit for card in self.hand.hand] + [card.value + card.suit for card in self.board.boardCards] 
@@ -49,13 +50,13 @@ class State:
 
 
 class GameState(State):
-    def __init__(self, board, hand, gameLog, legalMoves):
-        super().__init__(board, hand, gameLog)
+    def __init__(self, board, hand, gameLog, legalMoves, position):
+        super().__init__(board, hand, gameLog, position)
         self.legalMoves = legalMoves
         
         
 class FinalState(State):
-    def __init__(self, board, hand, gameLog, amountWon):
-        super().__init__(board, hand, gameLog)
+    def __init__(self, board, hand, gameLog, amountWon, position):
+        super().__init__(board, hand, gameLog, position)
         self.amountWon = amountWon
         
