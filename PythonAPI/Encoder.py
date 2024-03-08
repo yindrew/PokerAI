@@ -27,7 +27,6 @@ def decode_action(action):
     actions = ["FOLD", "CHECK", "CALL", "BET SMALL", "BET MEDIUM", "BET BIG", "BET ALL IN", "RAISE SMALL", "RAISE MEDIUM", "RAISE BIG", "RAISE ALL IN"]
     return actions[action]
 
-
  
 # One-hot encoding for decision and action
 def encode_action(action):

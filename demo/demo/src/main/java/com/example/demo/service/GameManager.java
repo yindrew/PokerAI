@@ -35,7 +35,7 @@ public class GameManager {
     private int check_counter;
     private HandRanking handRanking1;
     private HandRanking handRanking2;
-    private int totalTraining = 200;
+    private int totalTraining = 0;
     private int timesTrained = 0;
     private DecisionController decisionController;
 

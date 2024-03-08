@@ -38,7 +38,6 @@ def receive_game_state():
     game_state = GameState.from_json(game_state)
     currentModel = model_IP if game_state.position == 0 else model_OOP
     decision = make_decision(game_state, currentModel)
-    print(decision)
     return jsonify(decision)
 
 
